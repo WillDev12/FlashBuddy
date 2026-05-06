@@ -1,0 +1,5 @@
+[build]
+buildCommand = "cd scraper && npm install"
+
+[deploy]
+startCommand = "cd scraper && node server.js"
