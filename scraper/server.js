@@ -6,11 +6,13 @@ const puppeteer = IS_VERCEL ? require('puppeteer-core') : (() => { try { return 
 
 async function launchBrowser() {
   if (IS_VERCEL) {
-    const chromium = require('@sparticuz/chromium');
+    const chromium = require('@sparticuz/chromium-min');
     return puppeteer.launch({
       args: chromium.args,
       defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
+      executablePath: await chromium.executablePath(
+        'https://github.com/Sparticuz/chromium/releases/download/v131.0.0/chromium-v131.0.0-pack.tar'
+      ),
       headless: chromium.headless,
     });
   }

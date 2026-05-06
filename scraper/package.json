@@ -7,7 +7,7 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "@sparticuz/chromium": "^131.0.0",
+    "@sparticuz/chromium-min": "^131.0.0",
     "express": "^4.19.2",
     "puppeteer-core": "^24.15.0"
   },
