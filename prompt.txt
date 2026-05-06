@@ -1,0 +1,12 @@
+Make a quizlet alternative:
+
+Local, no database or 'dashboard,' just decks you can choose from in a dropdown at the top left
+   1. You can manage decks, but there aren't public/private decks, accounts, or anything that would be considered 'interweb'
+Has studying functionality (match, learn, test, flashcards)
+Simple UI, nothing too fancy
+You can create flashcard decks or import them
+   1. When importing, the user shares a quizlet deck link
+   2. The quizlet deck is web scraped for content and it is processed into the local program
+Decks are stored in cookies with the option to manually save them as files so they don't get lost
+   1. Should be able to import these files if chosen
+Should be able to be built into a standalone .html file

@@ -1,0 +1,48 @@
+/* ── SCRAPE LOG ── */
+    .scrape-log {
+      background: #141828;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-top: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      min-height: 72px;
+      max-height: 180px;
+      overflow-y: auto;
+      color: #c8d0e8;
+      line-height: 1.9;
+    }
+
+    .log-line {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      opacity: 0;
+      animation: logFadeIn 0.25s ease forwards;
+    }
+
+    @keyframes logFadeIn { to { opacity: 1; } }
+
+    .log-icon { flex-shrink: 0; width: 14px; text-align: center; }
+    .log-icon.ok { color: #4ADE80; }
+    .log-icon.err { color: #F87171; }
+    .log-icon.spin {
+      display: inline-block;
+      animation: logSpin 0.7s linear infinite;
+      color: #FBBF24;
+    }
+    @keyframes logSpin { to { transform: rotate(360deg); } }
+
+    .log-text { color: #c8d0e8; }
+    .log-text.dim { color: #4a5478; }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1.5px solid var(--border);
+    }
+
+    .modal-footer .spacer { flex: 1; }

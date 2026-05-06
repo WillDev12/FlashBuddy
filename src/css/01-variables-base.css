@@ -1,0 +1,36 @@
+:root {
+      --bg: #edf0f9;
+      --surface: #ffffff;
+      --surface2: #e2e7f5;
+      --ink: #1a1d2e;
+      --ink2: #545e80;
+      --ink3: #8f9ab8;
+      --accent: #4a6ccc;
+      --accent-light: #dae3f8;
+      --accent-glow: rgba(74, 108, 204, 0.16);
+      --green: #2a7a55;
+      --green-light: #dff2ea;
+      --red: #c0392b;
+      --red-light: #fce8e8;
+      --gold: #b8860b;
+      --gold-light: #fdf6d8;
+      --border: #ccd3ea;
+      --border2: #b5bdd8;
+      --shadow-sm: 0 2px 8px rgba(26,29,46,0.07);
+      --shadow: 0 4px 20px rgba(26,29,46,0.10);
+      --shadow-lg: 0 12px 40px rgba(26,29,46,0.14);
+      --radius: 14px;
+      --radius-sm: 8px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before { display: none; }

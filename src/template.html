@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlashBuddy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+<!-- CSS -->
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <span class="logo-dot"></span>
+    <span>FlashBuddy</span>
+  </div>
+  <div class="header-divider"></div>
+  <div class="deck-select-group">
+    <div class="deck-selector-wrap">
+      <select class="deck-select" id="deckSelect" onchange="onDeckChange()">
+        <option value="">— select a deck —</option>
+      </select>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="openManage()">Manage</button>
+  </div>
+  <div class="mode-tabs" id="modeTabs">
+    <button class="mode-tab active" data-mode="flashcards" onclick="switchMode('flashcards')">Flashcards</button>
+    <button class="mode-tab" data-mode="learn" onclick="switchMode('learn')">Learn</button>
+    <button class="mode-tab" data-mode="test" onclick="switchMode('test')">Test</button>
+    <button class="mode-tab" data-mode="match" onclick="switchMode('match')">Match</button>
+  </div>
+</header>
+
+<div class="update-banner hidden" id="updateBanner">
+  <span class="update-banner-text">Update available — <strong id="updateBannerTag"></strong></span>
+  <a class="update-banner-link" id="updateBannerLink" href="#" target="_blank" rel="noopener">View on GitHub →</a>
+  <button class="update-banner-close" onclick="dismissUpdate()">×</button>
+</div>
+
+<main id="main"></main>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ══════════════ MANAGE MODAL ══════════════ -->
+<div class="overlay hidden" id="manageModal" onclick="if(event.target===this)closeManage()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Your Decks</div>
+      <button class="modal-close" onclick="closeManage()">×</button>
+    </div>
+    <div class="deck-list" id="deckList">
+      <p style="color:var(--ink3);font-size:14px">No decks yet.</p>
+    </div>
+    <button class="btn btn-primary" onclick="openEditor(null)">+ New Deck</button>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Files</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="exportAll()">↓ Export All</button>
+        <label class="btn btn-ghost btn-sm" style="cursor:pointer">
+          ↑ Import File
+          <input type="file" accept=".json" onchange="importFile(event)" style="display:none">
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ EDITOR MODAL ══════════════ -->
+<div class="overlay hidden" id="editorModal" onclick="if(event.target===this)closeEditor()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="editorTitle">New Deck</div>
+      <button class="modal-close" onclick="closeEditor()">×</button>
+    </div>
+
+    <div class="field-label">Deck Name</div>
+    <input class="text-input" id="deckNameInput" placeholder="e.g. Spanish Vocabulary" />
+
+    <div class="card-rows-header">
+      <div class="field-label" style="margin:0">Term</div>
+      <div class="field-label" style="margin:0">Definition</div>
+      <div></div>
+    </div>
+    <div class="card-rows" id="cardRows"></div>
+    <button class="btn btn-ghost btn-sm" onclick="addRow()" style="margin-bottom:8px">+ Add Card</button>
+
+    <!-- Quizlet Import -->
+    <div class="modal-section">
+      <div class="modal-section-title">Import from Quizlet</div>
+
+      <div class="field-label">By URL</div>
+      <div class="offline-notice hidden" id="quizletOfflineNotice">No internet connection — URL import unavailable</div>
+      <div class="url-row">
+        <input class="text-input card-row-input" style="margin:0;flex:1" id="quizletUrl" placeholder="https://quizlet.com/..." />
+        <button class="btn btn-ghost btn-sm" id="quizletImportBtn" onclick="doQuizletImport()">Import</button>
+      </div>
+      <div class="import-status" id="importStatus"></div>
+      <div class="scrape-log hidden" id="scrapeLog"></div>
+
+      <div class="field-label" style="margin-top:20px">By Export String</div>
+      <div class="export-delimiters">
+        <span class="export-del-label">Term / def</span>
+        <select class="export-del-select" id="exportTermDel">
+          <option value="tab">Tab</option>
+          <option value="comma">Comma (,)</option>
+          <option value="semicolon">Semicolon (;)</option>
+          <option value="pipe">Pipe (|)</option>
+        </select>
+        <span class="export-del-label">Between cards</span>
+        <select class="export-del-select" id="exportCardDel">
+          <option value="newline">New line</option>
+          <option value="semicolon">Semicolon (;)</option>
+          <option value="comma">Comma (,)</option>
+        </select>
+      </div>
+      <textarea class="export-textarea" id="exportString" placeholder="Paste Quizlet export text here…"></textarea>
+      <div class="export-import-row">
+        <button class="btn btn-ghost btn-sm" onclick="doExportImport()">Import Cards</button>
+        <div class="import-status" id="exportStatus"></div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm hidden" id="deleteDeckBtn" onclick="deleteDeck()">Delete Deck</button>
+      <div class="spacer"></div>
+      <button class="btn btn-ghost" onclick="closeEditor()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveDeck()">Save Deck</button>
+    </div>
+  </div>
+</div>
+
+<script>
+<!-- JS -->
+</script>
+</body>
+</html>

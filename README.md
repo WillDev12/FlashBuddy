@@ -1,0 +1,40 @@
+# FlashBuddy
+
+A standalone, single-file flashcard study app. No accounts, no tracking, no internet required — just open `index.html` and study.
+
+## Features
+
+- **Flashcards** — flip through cards with keyboard shortcuts
+- **Learn** — adaptive MC + typing rounds in spaced sections
+- **Test** — configurable exam with multiple choice, matching, and written responses; flip terms/definitions; set question count
+- **Match** — timed drag-and-drop matching game
+- **Quizlet import** — import by URL (requires scraper) or paste an export string directly
+- **Offline support** — works fully offline; internet-only features are gracefully disabled
+- **Auto-update check** — notifies you when a new release is posted to GitHub
+
+## Quick start
+
+Download the latest `index.html` from the [releases page](https://github.com/WillDev12/EZmod-MC/releases) and open it in any browser. That's it.
+
+## Development
+
+**Requirements:** Node.js 18+
+
+```bash
+# one-time build
+npm run build
+
+# rebuild automatically on every file change
+npm run watch
+```
+
+Source files live in `src/` — CSS in `src/css/`, JS in `src/js/`, HTML shell in `src/template.html`. The build script concatenates and minifies everything into a single `index.html`.
+
+## Publishing a release
+
+1. Bump `APP_VERSION` in `src/js/01-state.js`
+2. Run `npm run build`
+3. Create a GitHub release tagged with the new version (e.g. `v1.0.1`)
+4. Attach `index.html` as a release asset
+
+Users running an older version will see an update banner the next time they open the app.

@@ -1,0 +1,27 @@
+/* ── EMPTY STATE ── */
+    .empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 20px;
+      gap: 16px;
+    }
+
+    .empty-glyph {
+      font-family: 'Manrope', sans-serif;
+      font-size: 72px;
+      line-height: 1;
+      color: var(--border2);
+      font-weight: 600;
+    }
+
+    .empty h2 {
+      font-family: 'Manrope', sans-serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .empty p { color: var(--ink2); font-size: 15px; }

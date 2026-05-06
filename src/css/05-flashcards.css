@@ -1,0 +1,153 @@
+/* ── FLASHCARD MODE ── */
+    .fc-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .fc-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 680px;
+    }
+
+    .fc-progress-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--ink3);
+      font-weight: 500;
+    }
+
+    .fc-hints {
+      font-size: 12px;
+      color: var(--ink3);
+    }
+
+    .fc-dots {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .fc-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: all 0.3s;
+    }
+
+    .fc-dot.past { background: var(--accent); opacity: 0.4; }
+    .fc-dot.current { background: var(--accent); width: 24px; border-radius: 4px; }
+    .fc-dot.future { background: var(--border); }
+
+    .card-viewport {
+      perspective: 1400px;
+      width: 100%;
+      max-width: 680px;
+      height: 280px;
+      cursor: pointer;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card-inner.flipped { transform: rotateY(180deg); }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border-radius: 20px;
+      padding: 40px 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 12px;
+    }
+
+    .card-face-front {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .card-face-back {
+      background: var(--accent);
+      transform: rotateY(180deg);
+      box-shadow: 0 12px 40px var(--accent-glow);
+    }
+
+    .card-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink3);
+      position: absolute;
+      top: 20px;
+      left: 24px;
+    }
+
+    .card-face-back .card-label { color: rgba(255,255,255,0.55); }
+
+    .card-text {
+      font-family: 'Manrope', sans-serif;
+      font-size: 32px;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.3;
+    }
+
+    .card-face-back .card-text { color: #fff; }
+
+    .fc-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .fc-nav-btn {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.18s;
+      color: var(--ink2);
+    }
+
+    .fc-nav-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+    .fc-nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+    .fc-flip-btn {
+      padding: 12px 32px;
+      border-radius: 50px;
+      border: none;
+      background: var(--ink);
+      color: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+
+    .fc-flip-btn:hover { background: var(--accent); transform: translateY(-1px); }
+
+    .fc-actions {
+      display: flex;
+      gap: 8px;
+    }

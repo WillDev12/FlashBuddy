@@ -1,0 +1,17 @@
+{
+  "name": "flashbuddy-scraper",
+  "version": "1.0.0",
+  "description": "Puppeteer backend for FlashBuddy Quizlet import",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@sparticuz/chromium": "^131.0.0",
+    "express": "^4.19.2",
+    "puppeteer-core": "^24.15.0"
+  },
+  "devDependencies": {
+    "puppeteer": "^24.15.0"
+  }
+}

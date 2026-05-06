@@ -1,0 +1,33 @@
+/* ── BUTTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 20px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+
+    .btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
+    .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 2px 8px var(--accent-glow); }
+    .btn-primary:hover { background: #3a5ab8; transform: translateY(-1px); box-shadow: 0 4px 14px var(--accent-glow); }
+    .btn-ghost { background: transparent; color: var(--ink2); border: 1.5px solid var(--border); }
+    .btn-ghost:hover { background: var(--surface2); border-color: var(--border2); color: var(--ink); }
+    .btn-icon { padding: 9px; width: 38px; height: 38px; }
+    .btn-sm { padding: 6px 14px; font-size: 13px; }
+    .btn-danger { background: var(--red); color: #fff; }
+    .btn-danger:hover { background: #a01830; }
+    /* ── MAIN ── */
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      min-height: calc(100vh - 60px);
+    }

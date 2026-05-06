@@ -1,0 +1,9 @@
+{
+  "name": "flashbuddy",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "node build.js",
+    "watch": "node build.js --watch",
+    "scraper": "cd scraper && npm start"
+  }
+}

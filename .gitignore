@@ -1,0 +1,5 @@
+node_modules/
+scraper/node_modules/
+index.html
+*.swp
+.DS_Store
