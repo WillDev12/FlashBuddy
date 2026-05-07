@@ -1,19 +1,8 @@
 const express = require('express');
 
-// Use puppeteer (local, bundled Chromium) or puppeteer-core + @sparticuz/chromium (Vercel)
-const IS_VERCEL = !!process.env.VERCEL;
-const puppeteer = IS_VERCEL ? require('puppeteer-core') : (() => { try { return require('puppeteer'); } catch(_) { return require('puppeteer-core'); } })();
+const puppeteer = require('puppeteer');
 
 async function launchBrowser() {
-  if (IS_VERCEL) {
-    const chromium = require('@sparticuz/chromium');
-    return puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
-    });
-  }
   return puppeteer.launch({
     headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-blink-features=AutomationControlled'],
@@ -255,10 +244,8 @@ app.get('/download', async (req, res) => {
   }
 });
 
-if (!IS_VERCEL) {
-  app.listen(PORT, () => {
-    console.log(`FlashBuddy scraper listening on http://localhost:${PORT}`);
-  });
-}
+app.listen(PORT, () => {
+  console.log(`FlashBuddy scraper listening on http://localhost:${PORT}`);
+});
 
 module.exports = app;
