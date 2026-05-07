@@ -1,5 +1,5 @@
 [build]
-buildCommand = "cd scraper && npm install"
+buildCommand = "cd scraper && PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install"
 
 [deploy]
 startCommand = "cd scraper && node server.js"

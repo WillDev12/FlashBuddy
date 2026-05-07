@@ -1,10 +1,20 @@
 const express = require('express');
 
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
+const { execSync } = require('child_process');
+
+function findChromium() {
+  if (process.env.CHROMIUM_PATH) return process.env.CHROMIUM_PATH;
+  for (const bin of ['chromium', 'chromium-browser', 'google-chrome']) {
+    try { return execSync(`which ${bin}`).toString().trim(); } catch (_) {}
+  }
+  throw new Error('No Chromium binary found — set CHROMIUM_PATH env var');
+}
 
 async function launchBrowser() {
   return puppeteer.launch({
     headless: true,
+    executablePath: findChromium(),
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-blink-features=AutomationControlled'],
   });
 }
