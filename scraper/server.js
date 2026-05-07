@@ -15,7 +15,14 @@ async function launchBrowser() {
   return puppeteer.launch({
     headless: true,
     executablePath: findChromium(),
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-blink-features=AutomationControlled'],
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      '--window-size=1920,1080',
+      '--disable-blink-features=AutomationControlled',
+    ],
   });
 }
 
@@ -157,35 +164,67 @@ app.get('/scrape', async (req, res) => {
     });
 
     try {
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
+      await page.goto(url, { waitUntil: 'networkidle2', timeout: 45000 });
     } catch (e) {
       if (!e.message.includes('timeout')) throw e;
-      // Page may be usable even if domcontentloaded timed out
     }
 
-    // Dismiss cookie/consent banners
+    // Wait for JS to settle, then dismiss consent banners
+    await new Promise(r => setTimeout(r, 2000));
     await page.evaluate(() => {
-      for (const sel of ['[data-testid="cookie-banner-accept"]', 'button[aria-label*="Accept"]']) {
+      for (const sel of [
+        '[data-testid="cookie-banner-accept"]',
+        'button[aria-label*="Accept"]',
+        'button[aria-label*="accept"]',
+        '[class*="CookieBanner"] button',
+        '[id*="cookie"] button',
+        '[class*="consent"] button',
+      ]) {
         document.querySelector(sel)?.click();
       }
     });
+    await new Promise(r => setTimeout(r, 1000));
 
     send('log', { msg: 'Waiting for cards to appear…' });
-    await page.waitForSelector('[aria-label="Term"]', { timeout: 30000 });
+
+    const CARD_SELECTORS = [
+      '[aria-label="Term"]',
+      '.SetPageTerm-side',
+      '[class*="TermText"]',
+      '[data-testid*="term-card"]',
+    ];
+
+    let foundSelector = null;
+    for (const sel of CARD_SELECTORS) {
+      try {
+        await page.waitForSelector(sel, { timeout: 8000 });
+        foundSelector = sel;
+        break;
+      } catch (_) {}
+    }
+
+    if (!foundSelector) {
+      const title = await page.title();
+      send('error', { msg: `Cards not found. Page title: "${title}". Quizlet may require login or changed its HTML.` });
+      return res.end();
+    }
 
     send('log', { msg: 'Scraping…' });
 
     const seen = new Map();
 
     function collectPage() {
-      return page.evaluate(() => {
-        return Array.from(document.querySelectorAll('[aria-label="Term"]')).map(item => {
+      return page.evaluate((sel) => {
+        return Array.from(document.querySelectorAll(sel)).map(item => {
           const sides = item.querySelectorAll('[data-testid="set-page-term-card-side"]');
-          const term = sides[0]?.querySelector('.TermText')?.textContent?.trim() ?? '';
+          const term = sides[0]?.querySelector('.TermText')?.textContent?.trim()
+            ?? item.querySelector('.TermText')?.textContent?.trim()
+            ?? item.textContent?.trim()
+            ?? '';
           const def  = sides[1]?.querySelector('.TermText')?.textContent?.trim() ?? '';
           return { term, def };
         }).filter(c => c.term && c.def);
-      });
+      }, foundSelector);
     }
 
     let stable = 0;
