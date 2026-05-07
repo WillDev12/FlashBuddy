@@ -197,7 +197,7 @@ app.get('/scrape', async (req, res) => {
     let foundSelector = null;
     for (const sel of CARD_SELECTORS) {
       try {
-        await page.waitForSelector(sel, { timeout: 8000 });
+        await page.waitForSelector(sel, { timeout: 15000 });
         foundSelector = sel;
         break;
       } catch (_) {}
