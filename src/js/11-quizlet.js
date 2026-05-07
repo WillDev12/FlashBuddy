@@ -1,10 +1,40 @@
 // ══════════════════════════════════════════════
 //  QUIZLET IMPORT
 // ══════════════════════════════════════════════
+function doQuizletHtmlImport(input) {
+  const file = input.files[0];
+  const statusEl = document.getElementById('htmlImportStatus');
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const cards = parseQuizlet(ev.target.result);
+    if (!cards || cards.length === 0) {
+      statusEl.className = 'import-status err';
+      statusEl.textContent = 'No cards found in this file. Make sure you saved the full Quizlet page.';
+    } else {
+      populateRows(cards);
+      statusEl.className = 'import-status ok';
+      statusEl.textContent = `Imported ${cards.length} card${cards.length !== 1 ? 's' : ''} ✓`;
+      if (!document.getElementById('deckNameInput').value.trim()) {
+        const m = file.name.replace(/\.html?$/i, '').replace(/[-_]/g, ' ');
+        document.getElementById('deckNameInput').value = m;
+      }
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
 function doQuizletImport() {
   const url = document.getElementById('quizletUrl').value.trim();
   const status = document.getElementById('importStatus');
   const logEl = document.getElementById('scrapeLog');
+
+  if (!SCRAPER_URL) {
+    status.className = 'import-status err';
+    status.textContent = 'URL import requires the scraper server — download the Scraper Included release.';
+    return;
+  }
 
   if (!url.includes('quizlet.com')) {
     status.className = 'import-status err';

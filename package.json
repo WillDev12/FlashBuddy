@@ -5,5 +5,8 @@
     "build": "node build.js",
     "watch": "node build.js --watch",
     "scraper": "cd scraper && npm start"
+  },
+  "devDependencies": {
+    "archiver": "^7.0.0"
   }
 }

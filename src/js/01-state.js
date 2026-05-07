@@ -3,7 +3,7 @@
 // ══════════════════════════════════════════════
 const APP_VERSION = '1.0.0';
 const GITHUB_REPO = 'WillDev12/FlashBuddy';
-const SCRAPER_URL = 'https://flashbuddy.vercel.app';
+const SCRAPER_URL = 'http://localhost:3000';
 
 // ══════════════════════════════════════════════
 //  STATE
