@@ -175,57 +175,30 @@ app.get('/scrape', async (req, res) => {
     });
 
     try {
-      await page.goto(url, { waitUntil: 'networkidle2', timeout: 45000 });
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
     } catch (e) {
       if (!e.message.includes('timeout')) throw e;
     }
 
-    await new Promise(r => setTimeout(r, 2000));
     await page.evaluate(() => {
-      for (const sel of [
-        '[data-testid="cookie-banner-accept"]',
-        'button[aria-label*="Accept"]',
-        'button[aria-label*="accept"]',
-        '[class*="CookieBanner"] button',
-        '[id*="cookie"] button',
-        '[class*="consent"] button',
-      ]) document.querySelector(sel)?.click();
+      for (const sel of ['[data-testid="cookie-banner-accept"]', 'button[aria-label*="Accept"]'])
+        document.querySelector(sel)?.click();
     });
-    await new Promise(r => setTimeout(r, 1000));
 
     send('log', { msg: 'Waiting for cards to appear…' });
-
-    const CARD_SELECTORS = [
-      '[aria-label="Term"]',
-      '.SetPageTerm-side',
-      '[class*="TermText"]',
-      '[data-testid*="term-card"]',
-    ];
-
-    let foundSelector = null;
-    for (const sel of CARD_SELECTORS) {
-      try { await page.waitForSelector(sel, { timeout: 15000 }); foundSelector = sel; break; }
-      catch (_) {}
-    }
-
-    if (!foundSelector) {
-      const title = await page.title();
-      send('error', { msg: `Cards not found. Page title: "${title}". Quizlet may require login or changed its HTML.` });
-      return res.end();
-    }
+    await page.waitForSelector('[aria-label="Term"]', { timeout: 30000 });
 
     send('log', { msg: 'Scraping…' });
     const seen = new Map();
 
-    const collectPage = () => page.evaluate((sel) => {
-      return Array.from(document.querySelectorAll(sel)).map(item => {
+    const collectPage = () => page.evaluate(() => {
+      return Array.from(document.querySelectorAll('[aria-label="Term"]')).map(item => {
         const sides = item.querySelectorAll('[data-testid="set-page-term-card-side"]');
-        const term = sides[0]?.querySelector('.TermText')?.textContent?.trim()
-          ?? item.querySelector('.TermText')?.textContent?.trim() ?? '';
+        const term = sides[0]?.querySelector('.TermText')?.textContent?.trim() ?? '';
         const def  = sides[1]?.querySelector('.TermText')?.textContent?.trim() ?? '';
         return { term, def };
       }).filter(c => c.term && c.def);
-    }, foundSelector);
+    });
 
     let stable = 0, lastReported = 0;
     while (stable < 4) {
