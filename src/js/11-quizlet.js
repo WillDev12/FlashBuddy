@@ -1,28 +1,152 @@
 // ══════════════════════════════════════════════
 //  QUIZLET IMPORT
 // ══════════════════════════════════════════════
-function doQuizletHtmlImport(input) {
+
+const PDFJS_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+const PDFJS_WORKER = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+function loadPdfJs() {
+  if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = PDFJS_CDN;
+    s.onload = () => {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER;
+      resolve(window.pdfjsLib);
+    };
+    s.onerror = () => reject(new Error('Failed to load PDF.js'));
+    document.head.appendChild(s);
+  });
+}
+
+async function doQuizletPdfImport(input) {
   const file = input.files[0];
-  const statusEl = document.getElementById('htmlImportStatus');
+  const statusEl = document.getElementById('pdfImportStatus');
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    const cards = parseQuizlet(ev.target.result);
-    if (!cards || cards.length === 0) {
+  statusEl.className = 'import-status';
+  statusEl.textContent = 'Reading PDF…';
+
+  try {
+    const pdfjs = await loadPdfJs();
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+
+    const allItems = [];
+    for (let p = 1; p <= pdf.numPages; p++) {
+      const page = await pdf.getPage(p);
+      const content = await page.getTextContent({ normalizeWhitespace: true });
+      for (const item of content.items) {
+        if (!item.str) continue;
+        allItems.push({ str: item.str, x: item.transform[4], y: item.transform[5], w: item.width || 0, page: p });
+      }
+    }
+
+    const cards = parsePdfItems(allItems);
+
+    if (!cards.length) {
       statusEl.className = 'import-status err';
-      statusEl.textContent = 'No cards found in this file. Make sure you saved the full Quizlet page.';
+      statusEl.textContent = 'No cards found. Make sure the PDF is a printed Quizlet page.';
     } else {
       populateRows(cards);
       statusEl.className = 'import-status ok';
       statusEl.textContent = `Imported ${cards.length} card${cards.length !== 1 ? 's' : ''} ✓`;
-      if (!document.getElementById('deckNameInput').value.trim()) {
-        const m = file.name.replace(/\.html?$/i, '').replace(/[-_]/g, ' ');
-        document.getElementById('deckNameInput').value = m;
+      const nameInput = document.getElementById('deckNameInput');
+      if (!nameInput.value.trim()) {
+        const title = extractPdfTitle(allItems);
+        if (title) nameInput.value = title;
       }
     }
-  };
-  reader.readAsText(file);
+  } catch (err) {
+    statusEl.className = 'import-status err';
+    statusEl.textContent = 'Error: ' + err.message;
+  }
   input.value = '';
+}
+
+function extractPdfTitle(items) {
+  const hit = items.find(i => i.str && i.str.includes('Flashcards | Quizlet'));
+  return hit ? hit.str.replace(/\s*Flashcards\s*\|\s*Quizlet.*$/i, '').trim() : null;
+}
+
+function parsePdfItems(items) {
+  if (!items.length) return [];
+
+  // Group items into rows by page + Y coordinate (±4pt tolerance)
+  // Page must match to prevent cross-page Y collisions
+  const rows = [];
+  for (const item of items) {
+    if (!item.str.trim()) {
+      const existing = rows.find(r => r.page === item.page && Math.abs(r.y - item.y) <= 4);
+      if (existing) existing.parts.push(item);
+      continue;
+    }
+    const existing = rows.find(r => r.page === item.page && Math.abs(r.y - item.y) <= 4);
+    if (existing) {
+      existing.parts.push(item);
+    } else {
+      rows.push({ y: item.y, page: item.page, parts: [item] });
+    }
+  }
+  // Sort by page, then top-to-bottom within page
+  rows.sort((a, b) => a.page !== b.page ? a.page - b.page : b.y - a.y);
+
+  // For each multi-item row, find the biggest intra-row gap → that splits term from def.
+  // Record where the right side (definition) starts; the modal value = definition column X.
+  // Find the biggest intra-row gap using only non-space items (spaces are trailing
+  // layout glyphs that sit between columns and corrupt the gap measurement).
+  function rowGap(parts) {
+    const sig = parts.filter(p => p.str.trim()).sort((a, b) => a.x - b.x);
+    let bigGap = 0, splitAfter = -1;
+    for (let i = 1; i < sig.length; i++) {
+      // Use end-to-start gap so adjacent glyphs of the same word (e.g. accented
+      // chars stored as separate fragments) don't produce a false large gap.
+      const gap = sig[i].x - (sig[i - 1].x + sig[i - 1].w);
+      if (gap > bigGap) { bigGap = gap; splitAfter = i; }
+    }
+    // threshold = midpoint between end of last left item and start of first right item
+    const threshold = splitAfter > 0
+      ? ((sig[splitAfter - 1].x + sig[splitAfter - 1].w) + sig[splitAfter].x) / 2
+      : null;
+    return { bigGap, sigRight: splitAfter > 0 ? sig[splitAfter] : null, threshold };
+  }
+
+  const defStarts = [];
+  for (const row of rows) {
+    if (row.parts.filter(p => p.str.trim()).length < 2) continue;
+    const { bigGap, sigRight } = rowGap(row.parts);
+    if (sigRight && bigGap > 30) {
+      defStarts.push(Math.round(sigRight.x / 5) * 5);
+    }
+  }
+
+  // Find modal definition column start (bin by 5px)
+  const freq = {};
+  for (const x of defStarts) freq[x] = (freq[x] || 0) + 1;
+  const modalDefX = defStarts.length
+    ? parseInt(Object.entries(freq).sort((a, b) => b[1] - a[1])[0][0])
+    : null;
+
+  if (!modalDefX) return [];
+
+  const skip = /terms in this set|students also studied|practice questions|quizlet\.com|study with|flashcard|don't know|leave the first/i;
+  const cards = [];
+
+  for (const row of rows) {
+    const { bigGap, sigRight, threshold } = rowGap(row.parts);
+    if (!sigRight || bigGap <= 30) continue;
+
+    // Definition column must start near modalDefX (±20px)
+    if (Math.abs(sigRight.x - modalDefX) > 20) continue;
+
+    // Partition all parts (including spaces) at the midpoint threshold
+    const left  = row.parts.filter(p => p.x <= threshold).sort((a, b) => a.x - b.x).map(p => p.str).join('');
+    const right = row.parts.filter(p => p.x >  threshold).sort((a, b) => a.x - b.x).map(p => p.str).join('');
+    if (!left.trim() || !right.trim()) continue;
+    if (skip.test(left) || skip.test(right)) continue;
+
+    cards.push({ term: left.trim(), def: right.trim() });
+  }
+  return cards;
 }
 
 function doQuizletImport() {
@@ -147,90 +271,3 @@ function doExportImport() {
   statusEl.className = 'import-status ok';
 }
 
-function parseQuizlet(html) {
-  // 1. Try __NEXT_DATA__ (Next.js — most common on modern Quizlet)
-  const nextMatch = html.match(/<script[^>]+id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
-  if (nextMatch) {
-    try {
-      const data = JSON.parse(nextMatch[1]);
-      const found = deepFindTerms(data);
-      if (found && found.length) return found;
-    } catch(e) {}
-  }
-
-  // 2. Try any script block with JSON
-  const scripts = [...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)];
-  for (const s of scripts) {
-    const text = s[1].trim();
-    if (text.length < 50) continue;
-    // Look for JSON starting with {
-    const jsonStart = text.indexOf('{');
-    if (jsonStart === -1) continue;
-    try {
-      const data = JSON.parse(text.slice(jsonStart));
-      const found = deepFindTerms(data);
-      if (found && found.length > 2) return found;
-    } catch(e) {}
-  }
-
-  // 3. Regex: "word":"...","definition":"..."
-  const pattern1 = [...html.matchAll(/"word"\s*:\s*"((?:[^"\\]|\\.)*)"\s*(?:,\s*"\w+"\s*:\s*(?:"[^"]*"|-?\d+|true|false|null)\s*)*,?\s*"definition"\s*:\s*"((?:[^"\\]|\\.)*)"/g)];
-  if (pattern1.length) return pattern1.map(m => ({ term: unescJson(m[1]), def: unescJson(m[2]) }));
-
-  // 4. Regex: "term":"...","definition":"..."
-  const pattern2 = [...html.matchAll(/"term"\s*:\s*"((?:[^"\\]|\\.)*)"\s*,[\s\S]*?"definition"\s*:\s*"((?:[^"\\]|\\.)*)"/g)];
-  if (pattern2.length) return pattern2.map(m => ({ term: unescJson(m[1]), def: unescJson(m[2]) }));
-
-  return [];
-}
-
-function deepFindTerms(obj, depth = 0) {
-  if (depth > 20 || !obj) return null;
-
-  // Try base64 decode for encoded state
-  if (typeof obj === 'string' && obj.length > 100 && /^[A-Za-z0-9+/=]+$/.test(obj)) {
-    try {
-      const decoded = atob(obj);
-      if (decoded.startsWith('{') || decoded.startsWith('[')) {
-        const parsed = JSON.parse(decoded);
-        const found = deepFindTerms(parsed, depth + 1);
-        if (found && found.length) return found;
-      }
-    } catch(e) {}
-  }
-
-  if (Array.isArray(obj) && obj.length > 0) {
-    const first = obj[0];
-    if (first && typeof first === 'object') {
-      const hasWord = 'word' in first || 'term' in first || 'front' in first;
-      const hasDef = 'definition' in first || 'def' in first || 'back' in first;
-      if (hasWord && hasDef) {
-        return obj.filter(Boolean).map(item => ({
-          term: String(item.word ?? item.term ?? item.front ?? ''),
-          def: String(item.definition ?? item.def ?? item.back ?? '')
-        })).filter(c => c.term || c.def);
-      }
-    }
-    for (const item of obj) {
-      const r = deepFindTerms(item, depth + 1);
-      if (r && r.length > 0) return r;
-    }
-  } else if (obj && typeof obj === 'object') {
-    // Prioritized keys
-    for (const key of ['terms','studiableItems','flashcards','cards','termIdToTermsMap','set','props','pageProps','dehydratedReduxStateKey','dehydratedState']) {
-      if (obj[key]) {
-        const r = deepFindTerms(obj[key], depth + 1);
-        if (r && r.length > 0) return r;
-      }
-    }
-    for (const key of Object.keys(obj)) {
-      const r = deepFindTerms(obj[key], depth + 1);
-      if (r && r.length > 0) return r;
-    }
-  }
-  return null;
-}
-
-function unescJson(s) {
-  return s.replace(/\\n/g,'\n').replace(/\\t/g,'\t').replace(/\\"/g,'"').replace(/\\\\/g,'\\').replace(/\\r/g,'');
-}

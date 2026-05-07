@@ -32,11 +32,13 @@ function setOnlineUI(online) {
 }
 
 window.addEventListener('offline', () => {
+  if (!SCRAPER_URL) return;
   toast('No internet connection — some features disabled', 4000);
   setOnlineUI(false);
 });
 
 window.addEventListener('online', () => {
+  if (!SCRAPER_URL) return;
   toast('Back online ✓');
   setOnlineUI(true);
 });
@@ -89,6 +91,12 @@ if (ids.length) {
   resetAllModes();
 }
 render();
-setOnlineUI(navigator.onLine);
-if (!navigator.onLine) setTimeout(() => toast('No internet connection — some features disabled', 4000), 400);
+if (!SCRAPER_URL) {
+  const notice = document.getElementById('quizletOfflineNotice');
+  if (notice) notice.textContent = 'URL import not available in standalone mode';
+  setOnlineUI(false);
+} else {
+  setOnlineUI(navigator.onLine);
+  if (!navigator.onLine) setTimeout(() => toast('No internet connection — some features disabled', 4000), 400);
+}
 checkForUpdate();

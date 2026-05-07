@@ -50,6 +50,7 @@
       <div class="modal-title">Your Decks</div>
       <button class="modal-close" onclick="closeManage()">×</button>
     </div>
+    <div class="modal-body">
     <div class="deck-list" id="deckList">
       <p style="color:var(--ink3);font-size:14px">No decks yet.</p>
     </div>
@@ -65,6 +66,7 @@
         </label>
       </div>
     </div>
+    </div>
   </div>
 </div>
 
@@ -76,6 +78,7 @@
       <button class="modal-close" onclick="closeEditor()">×</button>
     </div>
 
+    <div class="modal-body">
     <div class="field-label">Deck Name</div>
     <input class="text-input" id="deckNameInput" placeholder="e.g. Spanish Vocabulary" />
 
@@ -100,14 +103,14 @@
       <div class="import-status" id="importStatus"></div>
       <div class="scrape-log hidden" id="scrapeLog"></div>
 
-      <div class="field-label" style="margin-top:20px">By Saved HTML File</div>
-      <p style="font-size:13px;color:var(--ink3);margin-bottom:8px">On Quizlet, press <strong>Ctrl+S</strong> / <strong>Cmd+S</strong> to save the page, then upload that file.</p>
+      <div class="field-label" style="margin-top:20px">By Printed PDF</div>
+      <p style="font-size:13px;color:var(--ink3);margin-bottom:8px">Print a Quizlet page to PDF, then upload it here. <a href="https://flashbuddy.vercel.app/docs/import-pdf.md" target="_blank" rel="noopener" style="color:var(--accent)">How to use →</a></p>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <label class="btn btn-ghost btn-sm" style="cursor:pointer">
-          Upload Quizlet .html
-          <input type="file" accept=".html,.htm" onchange="doQuizletHtmlImport(this)" style="display:none">
+          Upload Quizlet .pdf
+          <input type="file" accept=".pdf" onchange="doQuizletPdfImport(this)" style="display:none">
         </label>
-        <div class="import-status" id="htmlImportStatus"></div>
+        <div class="import-status" id="pdfImportStatus"></div>
       </div>
 
       <div class="field-label" style="margin-top:20px">By Export String</div>
@@ -133,6 +136,7 @@
       </div>
     </div>
 
+    </div>
     <div class="modal-footer">
       <button class="btn btn-danger btn-sm hidden" id="deleteDeckBtn" onclick="deleteDeck()">Delete Deck</button>
       <div class="spacer"></div>

@@ -3,3 +3,5 @@ scraper/node_modules/
 index.html
 *.swp
 .DS_Store
+pdf-import-examples
+prompt.txt
