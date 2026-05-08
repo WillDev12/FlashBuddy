@@ -9,7 +9,7 @@ This method automatically scrapes a Quizlet set using a local browser. It requir
 
 ## Setup
 
-See [Setting Up the Scraper Server](setup-scraper) before using this method.
+See [Setting Up the Scraper Server](setup-scraper-server.md) before using this method.
 
 ## How to Use
 
@@ -24,4 +24,4 @@ See [Setting Up the Scraper Server](setup-scraper) before using this method.
 
 - The set must be **public**. Private sets require you to be logged in, which the scraper does not support.
 - Large sets (100+ cards) may take 30–60 seconds to fully scrape.
-- If the import fails with a "Cards not found" error, try the [Saved HTML File](import-html) method instead.
+- If the import fails with a "Cards not found" error, try the [Print Page](import-cards-using-pdf.md) method instead.

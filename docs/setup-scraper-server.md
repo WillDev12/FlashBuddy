@@ -2,9 +2,12 @@
 
 The scraper server enables **URL import** from Quizlet. It runs on your local machine and uses a real browser to load and extract flashcard data.
 
+**Note for ChromeOS users: This feature will not be compatible with your device! Standard Chromebooks offer no nodejs support.**
+
 ## Requirements
 
 - [Node.js](https://nodejs.org) v18 or later
+   - Download [here](https://nodejs.org/en/download), not available on ChromeOS
 - The **FlashBuddy — Scraper Included** `.zip` release
 
 ## Installation
@@ -32,4 +35,4 @@ To start the server again later, repeat step 3.
 
 **Port 3000 already in use** — Another process is using port 3000. Close it or change the port by editing `scraper/server.js` (line: `const PORT = 3000`).
 
-**Import still fails after starting the server** — Make sure the server window shows the "listening" message before importing. If the Quizlet set is private, use the [Saved HTML File](import-html) method instead.
+**Import still fails after starting the server** — Make sure the server window shows the "listening" message before importing. If the Quizlet set is private, use the PDF import method instead.

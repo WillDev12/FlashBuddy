@@ -1,6 +1,6 @@
-# Import from a Quizlet PDF
+# Import via 'Print Page'
 
-This method lets you import a Quizlet set by printing it to a PDF file. It works entirely offline — no scraper server or internet connection needed after the PDF is saved (though the first use requires a brief internet connection to load the PDF reader).
+This method lets you import a Quizlet set by saving it as a PDF file. It works entirely offline — no scraper server or internet connection needed after the PDF is saved (though the first use requires a brief internet connection to load the PDF reader).
 
 ## How to Use
 
