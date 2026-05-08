@@ -48,6 +48,16 @@ FlashBuddy supports several import methods:
 - **By PDF** — save a Quizlet set as a PDF and upload it. See [Import via PDF](import-cards-using-pdf).
 - **Paste export string** — copy a Quizlet export string and paste it directly into the import field in the deck editor.
 
+## Bookmarking FlashBuddy
+
+For quick access, bookmark the `.html` file in your browser after opening it. This lets you relaunch the app in one click without hunting down the file each time.
+
+- **Chrome / Edge:** Press `Ctrl+D` (Windows/Linux) or `Cmd+D` (Mac), then click **Done**.
+- **Firefox:** Press `Ctrl+D` / `Cmd+D`, or click the star icon in the address bar.
+- **Safari:** Press `Cmd+D`, or go to **Bookmarks → Add Bookmark**.
+
+Your decks are saved in the browser's local storage, so they persist between sessions as long as you use the same browser and profile.
+
 ## Offline Use
 
 FlashBuddy works fully offline after the initial page load. Features that require a scraper server (URL import) are gracefully disabled when the server is unreachable.

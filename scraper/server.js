@@ -18,6 +18,7 @@ function esc(s) {
 function shell(css) {
   return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='15' width='24' height='14' rx='2' fill='%2393c5fd' stroke='%2393c5fd' stroke-width='1.5'/%3E%3Ctext x='16' y='23' font-family='Arial Black,Arial,sans-serif' font-weight='900' font-size='24' text-anchor='middle' fill='%232563EB' stroke='black' stroke-width='1.5' paint-order='stroke fill'%3EF%3C/text%3E%3C/svg%3E">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,sans-serif;background:#f0f2f8;color:#1a1a2e;padding:40px 24px}
@@ -78,8 +79,10 @@ function downloadPage(release) {
     <div class="date">Released ${date}</div>
     ${links}
     ${notes}
+    <div style="display: flex; gap: 0.2rem">
     <a class="gh-link" href="https://github.com/${esc(GITHUB_REPO)}" target="_blank" rel="noopener">View on GitHub →</a>
-    <a class="docs-link" href="/docs">Documentation →</a>
+    <a class="docs-link" href="/docs">How to Use →</a>
+    </div>
   </div>` + shellEnd;
 }
 
@@ -107,7 +110,7 @@ function docsIndexPage(files) {
     .home:hover{color:#555}
   `) + `
   <h1>FlashBuddy Docs</h1>
-  <p class="sub">Guides for importing and setting up the scraper</p>
+  <p class="sub">How to navigate the app and use more advanced features.<br>Start by clicking on an article!</p>
   ${items}
   <a class="home" href="/download">← Back to Download</a>` + shellEnd;
 }
