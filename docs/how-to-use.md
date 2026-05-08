@@ -4,7 +4,7 @@
 
 Download `Flashbuddy vx.x.x -- Standalone` from the [download page](download) and open it in any browser. No install, no account, no internet required.
 
-*For details on how to install the Scraper Included release, see [Setting up the Scraper Server](setup-scraper-server.md).*
+*For details on how to install the Scraper Included release, see [Setting up the Scraper Server](setup-scraper-server).*
 
 ## Creating a Deck
 
@@ -44,8 +44,8 @@ Select a deck from the home screen, then pick a mode:
 
 FlashBuddy supports several import methods:
 
-- **By URL** — requires the scraper server. See [Import by URL](import-cards-using-url.md).
-- **By PDF** — save a Quizlet set as a PDF and upload it. See [Import via PDF](import-cards-using-pdf.md).
+- **By URL** — requires the scraper server. See [Import by URL](import-cards-using-url).
+- **By PDF** — save a Quizlet set as a PDF and upload it. See [Import via PDF](import-cards-using-pdf).
 - **Paste export string** — copy a Quizlet export string and paste it directly into the import field in the deck editor.
 
 ## Offline Use
