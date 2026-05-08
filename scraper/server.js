@@ -68,10 +68,9 @@ function downloadPage(release) {
     .notes{font-size:12px;color:#555;background:#f7f8fc;border:1px solid #e4e8f4;border-radius:6px;
            padding:14px;margin-top:20px;white-space:pre-wrap;word-break:break-word;
            max-height:180px;overflow-y:auto;line-height:1.6}
-    .gh-link{display:block;text-align:center;margin-top:18px;font-size:13px;color:#8891b0;text-decoration:none}
-    .gh-link:hover{color:#555}
-    .docs-link{display:block;text-align:center;margin-top:10px;font-size:13px;color:#8891b0;text-decoration:none}
-    .docs-link:hover{color:#555}
+    .bottom-links{display:flex;justify-content:center;align-items:center;gap:1.5rem;margin-top:18px}
+    .gh-link,.docs-link{font-size:13px;color:#8891b0;text-decoration:none}
+    .gh-link:hover,.docs-link:hover{color:#555}
   `) + `
   <div class="card">
     <div class="label">FlashBuddy</div>
@@ -79,9 +78,9 @@ function downloadPage(release) {
     <div class="date">Released ${date}</div>
     ${links}
     ${notes}
-    <div style="display: flex; gap: 0.2rem">
-    <a class="gh-link" href="https://github.com/${esc(GITHUB_REPO)}" target="_blank" rel="noopener">View on GitHub →</a>
-    <a class="docs-link" href="/docs">How to Use →</a>
+    <div class="bottom-links">
+      <a class="gh-link" href="https://github.com/${esc(GITHUB_REPO)}" target="_blank" rel="noopener">View on GitHub →</a>
+      <a class="docs-link" href="/docs">How to Use →</a>
     </div>
   </div>` + shellEnd;
 }
