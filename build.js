@@ -26,6 +26,8 @@ function readDir(dir) {
     .join('\n\n');
 }
 
+const FAVICON_B64 = fs.readFileSync(path.join(__dirname, 'scraper', 'favicon.png')).toString('base64');
+
 function buildHtml(scraperUrl) {
   const css = readDir(path.join(SRC, 'css'));
   let js    = readDir(path.join(SRC, 'js'));
@@ -36,7 +38,10 @@ function buildHtml(scraperUrl) {
       : `const SCRAPER_URL = '${scraperUrl}';`
   );
   let out = fs.readFileSync(path.join(SRC, 'template.html'), 'utf8');
-  out = out.replace('<!-- CSS -->', css).replace('<!-- JS -->', js);
+  out = out
+    .replace('{{FAVICON_B64}}', FAVICON_B64)
+    .replace('<!-- CSS -->', css)
+    .replace('<!-- JS -->', js);
   return minify(out);
 }
 
