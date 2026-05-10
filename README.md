@@ -1,4 +1,15 @@
-# FlashBuddy
+<p align="center"><img src="./scraper/favicon.png" width="200" height="200"></p>
+
+<h1 align="center">FlashBuddy</h1>
+
+<p align="center">
+  <img src="https://img.shields.io/github/last-commit/WillDev12/FlashBuddy" alt="GitHub last commit">
+  <img src="https://img.shields.io/github/commits-since/WillDev12/FlashBuddy/latest" alt="GitHub commits since latest release">
+  <img src="https://img.shields.io/github/contributors/WillDev12/FlashBuddy" alt="GitHub contributors">
+  <img src="https://img.shields.io/github/checks-status/WillDev12/FlashBuddy/main" alt="GitHub commit status">
+  <img src="https://img.shields.io/github/size/WillDev12/FlashBuddy/dist/standalone/FlashBuddy-standalone.html?label=standalone%20html" alt="Standalone HTML file size">
+  <img src="https://img.shields.io/github/stars/WillDev12/FlashBuddy" alt="GitHub repo stars">
+</p>
 
 A standalone, single-file flashcard study app. No accounts, no tracking, no internet required — just open `index.html` and study.
 
@@ -14,7 +25,7 @@ A standalone, single-file flashcard study app. No accounts, no tracking, no inte
 
 ## Quick start
 
-Download the latest `index.html` from the [releases page](https://github.com/WillDev12/EZmod-MC/releases) and open it in any browser. That's it.
+Download the latest `FlashBuddy-standalone.html` from the [releases page](https://github.com/WillDev12/FlashBuddy/releases) and open it in any browser. That's it.
 
 ## Development
 
@@ -35,6 +46,6 @@ Source files live in `src/` — CSS in `src/css/`, JS in `src/js/`, HTML shell i
 1. Bump `APP_VERSION` in `src/js/01-state.js`
 2. Run `npm run build`
 3. Create a GitHub release tagged with the new version (e.g. `v1.0.1`)
-4. Attach `index.html` as a release asset
+4. Attach `dist/standalone/FlashBuddy-standalone.html` as a release asset
 
 Users running an older version will see an update banner the next time they open the app.
