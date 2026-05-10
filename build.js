@@ -2,6 +2,7 @@
 const fs       = require('fs');
 const path     = require('path');
 const archiver = require('archiver');
+const { minify: terser } = require('terser');
 
 const SRC        = path.join(__dirname, 'src');
 const SCRAPER    = path.join(__dirname, 'scraper');
@@ -28,7 +29,7 @@ function readDir(dir) {
 
 const FAVICON_B64 = fs.readFileSync(path.join(__dirname, 'scraper', 'favicon.png')).toString('base64');
 
-function buildHtml(scraperUrl) {
+async function buildHtml(scraperUrl) {
   const css = readDir(path.join(SRC, 'css'));
   let js    = readDir(path.join(SRC, 'js'));
   js = js.replace(
@@ -37,11 +38,12 @@ function buildHtml(scraperUrl) {
       ? 'const SCRAPER_URL = null;'
       : `const SCRAPER_URL = '${scraperUrl}';`
   );
+  const { code } = await terser(js, { compress: true, mangle: true });
   let out = fs.readFileSync(path.join(SRC, 'template.html'), 'utf8');
   out = out
     .replace('{{FAVICON_B64}}', FAVICON_B64)
     .replace('<!-- CSS -->', css)
-    .replace('<!-- JS -->', js);
+    .replace('<!-- JS -->', code);
   return minify(out);
 }
 
@@ -61,14 +63,14 @@ async function build() {
   const t = new Date().toLocaleTimeString();
 
   // ── Dev build (index.html) ──
-  const devHtml = buildHtml('http://localhost:3000');
+  const devHtml = await buildHtml('http://localhost:3000');
   fs.writeFileSync(path.join(__dirname, 'index.html'), devHtml);
   console.log(`[${t}] Built → index.html (${(devHtml.length / 1024).toFixed(1)} KB)`);
 
   // ── Standalone ──
   const standaloneDir = path.join(DIST, 'standalone');
   fs.mkdirSync(standaloneDir, { recursive: true });
-  const standaloneHtml = buildHtml(null);
+  const standaloneHtml = await buildHtml(null);
   const standaloneOut  = path.join(standaloneDir, 'FlashBuddy-standalone.html');
   fs.writeFileSync(standaloneOut, standaloneHtml);
   console.log(`[${t}] Built → dist/standalone/FlashBuddy-standalone.html (${(standaloneHtml.length / 1024).toFixed(1)} KB)`);
@@ -76,7 +78,7 @@ async function build() {
   // ── Scraper Included ──
   const scraperDir = path.join(DIST, 'scraper-included');
   fs.mkdirSync(scraperDir, { recursive: true });
-  const scraperHtml = buildHtml('http://localhost:3000');
+  const scraperHtml = await buildHtml('http://localhost:3000');
   const zipOut      = path.join(scraperDir, 'FlashBuddy-scraper-included.zip');
 
   await zip(zipOut, archive => {

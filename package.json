@@ -7,6 +7,7 @@
     "scraper": "cd scraper && npm start"
   },
   "devDependencies": {
-    "archiver": "^7.0.0"
+    "archiver": "^7.0.0",
+    "terser": "^5.47.1"
   }
 }
