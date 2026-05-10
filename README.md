@@ -1,8 +1,6 @@
-<p align="center"><img src="./scraper/favicon.png" width="200" height="200"></p>
+<h1>FlashBuddy</h1>
 
-<h1 align="center">FlashBuddy</h1>
-
-<p align="center">
+<p>
   <img src="https://img.shields.io/github/last-commit/WillDev12/FlashBuddy" alt="GitHub last commit">
   <img src="https://img.shields.io/github/commits-since/WillDev12/FlashBuddy/latest" alt="GitHub commits since latest release">
   <img src="https://img.shields.io/github/contributors/WillDev12/FlashBuddy" alt="GitHub contributors">
