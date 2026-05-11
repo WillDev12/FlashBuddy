@@ -7,11 +7,21 @@ const { minify: terser } = require('terser');
 const SRC        = path.join(__dirname, 'src');
 const SCRAPER    = path.join(__dirname, 'scraper');
 const DIST       = path.join(__dirname, 'dist');
+const { version: APP_VERSION } = require('./package.json');
+
+function minifyCss(css) {
+  return css
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/\s+/g, ' ')
+    .replace(/\s*([{}:;,>~+])\s*/g, '$1')
+    .replace(/;}/g, '}')
+    .trim();
+}
 
 function minify(html) {
   return html
     .replace(/(<style[^>]*>)([\s\S]*?)(<\/style>)/g, (_, open, css, close) =>
-      open + css.replace(/\/\*[\s\S]*?\*\//g, '') + close)
+      open + minifyCss(css) + close)
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/[ \t]{2,}/g, ' ')
     .replace(/\n\s*\n+/g, '\n')
@@ -32,12 +42,14 @@ const FAVICON_B64 = fs.readFileSync(path.join(__dirname, 'scraper', 'favicon.png
 async function buildHtml(scraperUrl) {
   const css = readDir(path.join(SRC, 'css'));
   let js    = readDir(path.join(SRC, 'js'));
-  js = js.replace(
-    /const SCRAPER_URL = .*;/,
-    scraperUrl === null
-      ? 'const SCRAPER_URL = null;'
-      : `const SCRAPER_URL = '${scraperUrl}';`
-  );
+  js = js
+    .replace(/const APP_VERSION = .*;/, `const APP_VERSION = '${APP_VERSION}';`)
+    .replace(
+      /const SCRAPER_URL = .*;/,
+      scraperUrl === null
+        ? 'const SCRAPER_URL = null;'
+        : `const SCRAPER_URL = '${scraperUrl}';`
+    );
   const { code } = await terser(js, { compress: true, mangle: true });
   let out = fs.readFileSync(path.join(SRC, 'template.html'), 'utf8');
   out = out

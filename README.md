@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/github/contributors/WillDev12/FlashBuddy" alt="GitHub contributors">
   <img src="https://img.shields.io/github/checks-status/WillDev12/FlashBuddy/main" alt="GitHub commit status">
   <img src="https://img.shields.io/github/size/WillDev12/FlashBuddy/dist/standalone/FlashBuddy-standalone.html?label=standalone%20html" alt="Standalone HTML file size">
-  <img src="https://img.shields.io/github/stars/WillDev12/FlashBuddy" alt="GitHub repo stars">
+  <img src="https://img.shields.io/github/stars/WillDev12/FlashBuddy?style=social" alt="GitHub repo stars">
 </p>
 
 A standalone, single-file flashcard study app. No accounts, no tracking, no internet required — just open `index.html` and study.

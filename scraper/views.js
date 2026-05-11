@@ -80,6 +80,7 @@ function downloadPage(release) {
     ${notes}
     <div class="bottom-links">
       <a class="gh-link" href="https://github.com/${esc(GITHUB_REPO)}" target="_blank" rel="noopener">View on GitHub →</a>
+      <a href="https://github.com/${esc(GITHUB_REPO)}" target="_blank" rel="noopener"><img src="https://img.shields.io/github/stars/${esc(GITHUB_REPO)}?style=social" alt="GitHub stars" style="vertical-align:middle"></a>
       <a class="docs-link" href="/docs">How to Use →</a>
     </div>
   </div>` + shellEnd;
