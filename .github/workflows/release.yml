@@ -23,7 +23,9 @@ jobs:
 
       - run: npm run build
 
-      - name: Upload standalone HTML to release
+      - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/standalone/FlashBuddy-standalone.html
+          files: |
+            dist/standalone/FlashBuddy-standalone.html
+            dist/scraper-included/FlashBuddy-scraper-included.zip
