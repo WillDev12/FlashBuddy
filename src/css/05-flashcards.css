@@ -61,6 +61,12 @@
 
     .card-inner.flipped { transform: rotateY(180deg); }
 
+    @media (prefers-reduced-motion: reduce) {
+      .card-inner { transition: none; }
+      .fc-dot { transition: none; }
+      .fc-nav-btn, .fc-flip-btn { transition: none; }
+    }
+
     .card-face {
       position: absolute;
       inset: 0;

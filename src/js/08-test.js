@@ -358,14 +358,21 @@ function applyGradeStyles() {
   tform.mc.forEach((q, qi) => {
     const correctIdx = q.opts.indexOf(q.correctAns);
     document.querySelectorAll(`#mc_${qi} .mc-opt`).forEach((btn, oi) => {
-      if (oi === correctIdx) btn.classList.add('opt-correct');
-      else if (oi === q.answer) btn.classList.add('opt-wrong');
+      if (oi === correctIdx) {
+        btn.classList.add('opt-correct');
+        btn.setAttribute('aria-label', btn.textContent + ' — correct answer');
+      } else if (oi === q.answer) {
+        btn.classList.add('opt-wrong');
+        btn.setAttribute('aria-label', btn.textContent + ' — your answer, incorrect');
+      }
     });
   });
   tform.matchTerms.forEach((t, i) => {
     const sel = document.getElementById('ms_' + i);
     if (!sel) return;
-    sel.classList.add(t.answer === t.correctLetter ? 'opt-correct' : 'opt-wrong');
+    const correct = t.answer === t.correctLetter;
+    sel.classList.add(correct ? 'opt-correct' : 'opt-wrong');
+    sel.setAttribute('aria-label', (sel.options[sel.selectedIndex]?.text || '') + (correct ? ' — correct' : ' — incorrect'));
   });
   tform.written.forEach((q, i) => {
     const inp = document.getElementById('wi_' + i);
@@ -373,6 +380,7 @@ function applyGradeStyles() {
     if (!inp) return;
     const ok = q.answer && checkSimilar(normalizeAnswer(q.answer), normalizeAnswer(q.correctAns));
     inp.classList.add(ok ? 'opt-correct' : 'opt-wrong');
+    inp.setAttribute('aria-label', (ok ? 'Correct. ' : 'Incorrect. ') + 'Your answer: ' + (q.answer || ''));
     if (!ok && rev) rev.textContent = q.correctAns;
   });
 }

@@ -113,3 +113,9 @@
       60% { transform: translateX(-5px); }
       80% { transform: translateX(5px); }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .match-card { transition: none; }
+      .match-card.matched { animation: none; }
+      .match-card.wrong { animation: none; }
+    }

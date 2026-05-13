@@ -14,6 +14,7 @@
     }
 
     @keyframes toastIn { from { opacity: 0; transform: translateY(12px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
     /* ── UTILITIES ── */
     .hidden { display: none !important; }
     .text-center { text-align: center; }

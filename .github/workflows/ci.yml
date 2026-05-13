@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    paths:
+      - 'src/**'
+      - 'build.js'
+      - 'package*.json'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'build.js'
+      - 'package*.json'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Verify output exists
+        run: test -f dist/standalone/FlashBuddy-standalone.html

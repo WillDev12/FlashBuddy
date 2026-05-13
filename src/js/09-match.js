@@ -48,9 +48,11 @@ function renderMatch() {
 
   const grid = mt.cards.map(mc => {
     let cls = 'match-card';
-    if (mc.matched) cls += ' matched';
-    else if (mt.selected && mt.selected.id === mc.id) cls += ' selected';
-    return `<div class="${cls}" id="mc_${mc.id}" onclick="matchSelect('${mc.id}')">${escHtml(mc.text)}</div>`;
+    let ariaLabel = escHtml(mc.text);
+    if (mc.matched) { cls += ' matched'; ariaLabel += ' — matched'; }
+    else if (mt.selected && mt.selected.id === mc.id) { cls += ' selected'; ariaLabel += ' — selected'; }
+    const disabled = mc.matched ? 'aria-disabled="true"' : '';
+    return `<div class="${cls}" id="mc_${mc.id}" role="button" tabindex="${mc.matched ? '-1' : '0'}" aria-label="${ariaLabel}" ${disabled} onclick="matchSelect('${mc.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();matchSelect('${mc.id}')}">${escHtml(mc.text)}</div>`;
   }).join('');
 
   // Timer

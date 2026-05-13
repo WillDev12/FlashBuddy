@@ -4,7 +4,7 @@
       --surface2: #e2e7f5;
       --ink: #1a1d2e;
       --ink2: #545e80;
-      --ink3: #8f9ab8;
+      --ink3: #5a6884;
       --accent: #4a6ccc;
       --accent-light: #dae3f8;
       --accent-glow: rgba(74, 108, 204, 0.16);
@@ -34,3 +34,13 @@
     }
 
     body::before { display: none; }
+
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }

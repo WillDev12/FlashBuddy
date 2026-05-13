@@ -23,7 +23,9 @@ function onDeckChange() {
 function switchMode(mode) {
   activeMode = mode;
   document.querySelectorAll('.mode-tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.mode === mode);
+    const active = t.dataset.mode === mode;
+    t.classList.toggle('active', active);
+    t.setAttribute('aria-selected', active ? 'true' : 'false');
   });
   resetMode(mode);
   render();

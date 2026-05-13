@@ -41,9 +41,13 @@ Source files live in `src/` — CSS in `src/css/`, JS in `src/js/`, HTML shell i
 
 ## Publishing a release
 
-1. Bump `APP_VERSION` in `src/js/01-state.js`
-2. Run `npm run build`
-3. Create a GitHub release tagged with the new version (e.g. `v1.0.1`)
-4. Attach `dist/standalone/FlashBuddy-standalone.html` as a release asset
+1. Bump `APP_VERSION` in `src/js/01-state.js` and `version` in `package.json`
+2. Update `CHANGELOG.md`
+3. Push a version tag — the CI workflow builds and attaches the release asset automatically:
+
+```bash
+git tag v1.0.1
+git push origin v1.0.1
+```
 
 Users running an older version will see an update banner the next time they open the app.

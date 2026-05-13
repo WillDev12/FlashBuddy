@@ -1,13 +1,41 @@
 // ══════════════════════════════════════════════
+//  FOCUS TRAP
+// ══════════════════════════════════════════════
+function makeTrapHandler(container) {
+  return function(e) {
+    if (e.key !== 'Tab') return;
+    const focusable = Array.from(container.querySelectorAll(
+      'button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), a[href], [tabindex]:not([tabindex="-1"])'
+    )).filter(el => !el.closest('.hidden'));
+    if (!focusable.length) return;
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  };
+}
+
+// ══════════════════════════════════════════════
 //  MANAGE MODAL
 // ══════════════════════════════════════════════
+let _manageFocusOrigin = null;
+let _manageTrapHandler = null;
+
 function openManage() {
   refreshDeckList();
-  document.getElementById('manageModal').classList.remove('hidden');
+  const modal = document.getElementById('manageModal');
+  _manageFocusOrigin = document.activeElement;
+  modal.classList.remove('hidden');
+  const first = modal.querySelector('button:not(:disabled), input:not(:disabled), [tabindex]:not([tabindex="-1"])');
+  if (first) setTimeout(() => first.focus(), 50);
+  _manageTrapHandler = makeTrapHandler(modal);
+  modal.addEventListener('keydown', _manageTrapHandler);
 }
 
 function closeManage() {
-  document.getElementById('manageModal').classList.add('hidden');
+  const modal = document.getElementById('manageModal');
+  modal.classList.add('hidden');
+  if (_manageTrapHandler) { modal.removeEventListener('keydown', _manageTrapHandler); _manageTrapHandler = null; }
+  if (_manageFocusOrigin) { _manageFocusOrigin.focus(); _manageFocusOrigin = null; }
 }
 
 function refreshDeckList() {
@@ -32,6 +60,9 @@ function refreshDeckList() {
 // ══════════════════════════════════════════════
 //  EDITOR MODAL
 // ══════════════════════════════════════════════
+let _editorFocusOrigin = null;
+let _editorTrapHandler = null;
+
 function openEditor(id) {
   editingId = id;
   const titleEl = document.getElementById('editorTitle');
@@ -56,12 +87,19 @@ function openEditor(id) {
   document.getElementById('exportString').value = '';
   document.getElementById('exportStatus').textContent = '';
   document.getElementById('exportStatus').className = 'import-status';
-  document.getElementById('editorModal').classList.remove('hidden');
+  const editorModal = document.getElementById('editorModal');
+  _editorFocusOrigin = document.activeElement;
+  editorModal.classList.remove('hidden');
   setTimeout(() => nameEl.focus(), 80);
+  _editorTrapHandler = makeTrapHandler(editorModal);
+  editorModal.addEventListener('keydown', _editorTrapHandler);
 }
 
 function closeEditor() {
-  document.getElementById('editorModal').classList.add('hidden');
+  const editorModal = document.getElementById('editorModal');
+  editorModal.classList.add('hidden');
+  if (_editorTrapHandler) { editorModal.removeEventListener('keydown', _editorTrapHandler); _editorTrapHandler = null; }
+  if (_editorFocusOrigin) { _editorFocusOrigin.focus(); _editorFocusOrigin = null; }
   editingId = null;
 }
 
@@ -72,9 +110,9 @@ function populateRows(cards) {
 
 function makeRowHtml(term, def, i) {
   return `<div class="card-row" id="row_${i}">
-    <input class="card-row-input" type="text" placeholder="Term" value="${escHtml(term)}" />
-    <input class="card-row-input" type="text" placeholder="Definition" value="${escHtml(def)}" />
-    <button class="row-del" onclick="removeRow('row_${i}')">×</button>
+    <input class="card-row-input" type="text" placeholder="Term" aria-label="Card ${i + 1} term" value="${escHtml(term)}" />
+    <input class="card-row-input" type="text" placeholder="Definition" aria-label="Card ${i + 1} definition" value="${escHtml(def)}" />
+    <button class="row-del" onclick="removeRow('row_${i}')" aria-label="Delete card ${i + 1}">×</button>
   </div>`;
 }
 
@@ -85,9 +123,9 @@ function addRow() {
   el.id = 'row_' + idx;
   el.className = 'card-row';
   el.innerHTML = `
-    <input class="card-row-input" type="text" placeholder="Term" />
-    <input class="card-row-input" type="text" placeholder="Definition" />
-    <button class="row-del" onclick="removeRow('row_${idx}')">×</button>`;
+    <input class="card-row-input" type="text" placeholder="Term" aria-label="Card ${idx + 1} term" />
+    <input class="card-row-input" type="text" placeholder="Definition" aria-label="Card ${idx + 1} definition" />
+    <button class="row-del" onclick="removeRow('row_${idx}')" aria-label="Delete card ${idx + 1}">×</button>`;
   container.appendChild(el);
   el.querySelector('input').focus();
   container.scrollTop = container.scrollHeight;

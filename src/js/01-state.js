@@ -1,7 +1,7 @@
 // ══════════════════════════════════════════════
 //  CONFIG  — fill in before publishing
 // ══════════════════════════════════════════════
-const APP_VERSION = '1.1.1';
+const APP_VERSION = '1.1.4';
 const GITHUB_REPO = 'WillDev12/FlashBuddy';
 const SCRAPER_URL = 'http://localhost:3000';
 

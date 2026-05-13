@@ -20,36 +20,38 @@
   <div class="header-divider"></div>
   <div class="deck-select-group">
     <div class="deck-selector-wrap">
+      <label for="deckSelect" class="sr-only">Active deck</label>
       <select class="deck-select" id="deckSelect" onchange="onDeckChange()">
         <option value="">— select a deck —</option>
       </select>
     </div>
     <button class="btn btn-ghost btn-sm" onclick="openManage()">Manage</button>
   </div>
-  <div class="mode-tabs" id="modeTabs">
-    <button class="mode-tab active" data-mode="flashcards" onclick="switchMode('flashcards')">Flashcards</button>
-    <button class="mode-tab" data-mode="learn" onclick="switchMode('learn')">Learn</button>
-    <button class="mode-tab" data-mode="test" onclick="switchMode('test')">Test</button>
-    <button class="mode-tab" data-mode="match" onclick="switchMode('match')">Match</button>
+  <div class="mode-tabs" id="modeTabs" role="tablist" aria-label="Study modes">
+    <button class="mode-tab active" role="tab" aria-selected="true" data-mode="flashcards" onclick="switchMode('flashcards')">Flashcards</button>
+    <button class="mode-tab" role="tab" aria-selected="false" data-mode="learn" onclick="switchMode('learn')">Learn</button>
+    <button class="mode-tab" role="tab" aria-selected="false" data-mode="test" onclick="switchMode('test')">Test</button>
+    <button class="mode-tab" role="tab" aria-selected="false" data-mode="match" onclick="switchMode('match')">Match</button>
   </div>
 </header>
 
 <div class="update-banner hidden" id="updateBanner">
   <span class="update-banner-text">Update available — <strong id="updateBannerTag"></strong></span>
   <a class="update-banner-link" id="updateBannerLink" href="#" target="_blank" rel="noopener">View on GitHub →</a>
-  <button class="update-banner-close" onclick="dismissUpdate()">×</button>
+  <button class="update-banner-close" onclick="dismissUpdate()" aria-label="Dismiss update">×</button>
 </div>
 
 <main id="main"></main>
 
+<div class="sr-only" id="a11yAnnounce" aria-live="polite" aria-atomic="true"></div>
 <div class="toast-container" id="toastContainer"></div>
 
 <!-- ══════════════ MANAGE MODAL ══════════════ -->
 <div class="overlay hidden" id="manageModal" onclick="if(event.target===this)closeManage()">
-  <div class="modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="manageDialogTitle">
     <div class="modal-header">
-      <div class="modal-title">Your Decks</div>
-      <button class="modal-close" onclick="closeManage()">×</button>
+      <div class="modal-title" id="manageDialogTitle">Your Decks</div>
+      <button class="modal-close" onclick="closeManage()" aria-label="Close">×</button>
     </div>
     <div class="modal-body">
     <div class="deck-list" id="deckList">
@@ -73,10 +75,10 @@
 
 <!-- ══════════════ EDITOR MODAL ══════════════ -->
 <div class="overlay hidden" id="editorModal" onclick="if(event.target===this)closeEditor()">
-  <div class="modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
     <div class="modal-header">
       <div class="modal-title" id="editorTitle">New Deck</div>
-      <button class="modal-close" onclick="closeEditor()">×</button>
+      <button class="modal-close" onclick="closeEditor()" aria-label="Close">×</button>
     </div>
 
     <div class="modal-body">
