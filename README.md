@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/github/contributors/WillDev12/FlashBuddy" alt="GitHub contributors">
   <img src="https://img.shields.io/github/checks-status/WillDev12/FlashBuddy/main" alt="GitHub commit status">
   <img src="https://img.shields.io/github/size/WillDev12/FlashBuddy/dist/standalone/FlashBuddy-standalone.html?label=standalone%20html" alt="Standalone HTML file size">
-  <img src="https://img.shields.io/github/stars/WillDev12/FlashBuddy?style=social" alt="GitHub repo stars">
+  <img src="https://img.shields.io/github/stars/WillDev12/FlashBuddy?style=default&color=yellow" alt="GitHub repo stars">
 </p>
 
 A standalone, single-file flashcard study app. No accounts, no tracking, no internet required — just open `index.html` and study.
@@ -25,6 +25,13 @@ A standalone, single-file flashcard study app. No accounts, no tracking, no inte
 
 Download the latest `FlashBuddy-standalone.html` from the [releases page](https://github.com/WillDev12/FlashBuddy/releases) and open it in any browser. That's it.
 
+## Docs
+
+- [How to use](docs/how-to-use.md)
+- [Import cards by URL](docs/import-cards-using-url.md)
+- [Import cards from PDF](docs/import-cards-using-pdf.md)
+- [Set up the scraper server](docs/setup-scraper-server.md)
+
 ## Development
 
 **Requirements:** Node.js 18+
@@ -41,7 +48,7 @@ Source files live in `src/` — CSS in `src/css/`, JS in `src/js/`, HTML shell i
 
 ## Publishing a release
 
-1. Bump `APP_VERSION` in `src/js/01-state.js` and `version` in `package.json`
+1. Bump `version` in `package.json`
 2. Update `CHANGELOG.md`
 3. Push a version tag — the CI workflow builds and attaches the release asset automatically:
 
