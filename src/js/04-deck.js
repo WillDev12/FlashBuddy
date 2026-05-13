@@ -43,6 +43,7 @@ function resetMode(mode) {
   } else if (mode === 'test') {
     buildTest(cards);
   } else if (mode === 'match') {
-    buildMatch(cards);
+    if (mt.timerInterval) { clearInterval(mt.timerInterval); mt.timerInterval = null; }
+    mt.cards = []; mt.started = false; mt.pairs = 0; mt.total = 0;
   }
 }

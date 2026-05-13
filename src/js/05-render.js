@@ -5,6 +5,12 @@ function render() {
   const main = document.getElementById('main');
   const cards = getValidCards();
 
+  if (activeMode !== 'test') {
+    const tw = document.getElementById('testTimerWidget');
+    if (tw) { tw.style.display = 'none'; }
+    if (tform.timerInterval) { clearInterval(tform.timerInterval); tform.timerInterval = null; }
+  }
+
   if (!activeDeckId) {
     main.innerHTML = `
       <div class="empty">

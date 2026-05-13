@@ -8,13 +8,30 @@ function buildTest(cards) {
     tform.mc = []; tform.matchTerms = []; tform.matchDefs = []; tform.written = []; return;
   }
 
+  if (tform.timerInterval) { clearInterval(tform.timerInterval); tform.timerInterval = null; }
+  tform.submitWarned = false;
+
   const s = tform.settings;
   const flip = s.flip;
-  const qN = Math.min(Math.max(1, s.qCount), cards.length);
+  const totalQ = Math.min(Math.max(1, s.qCount), cards.length);
   const pool = shuffle([...cards]);
 
-  if (s.mc) {
-    tform.mc = pool.slice(0, qN).map(card => {
+  const mcEnabled      = s.mc;
+  const matchEnabled   = s.match && cards.length >= 4;
+  const writtenEnabled = s.written;
+  const numEnabled = (mcEnabled ? 1 : 0) + (matchEnabled ? 1 : 0) + (writtenEnabled ? 1 : 0);
+
+  let mcN = 0, matchN = 0, writtenN = 0;
+  if (numEnabled > 0) {
+    const base = Math.floor(totalQ / numEnabled);
+    let extra = totalQ % numEnabled;
+    if (mcEnabled)      { mcN      = base + (extra-- > 0 ? 1 : 0); }
+    if (matchEnabled)   { matchN   = base + (extra-- > 0 ? 1 : 0); }
+    if (writtenEnabled) { writtenN = base + (extra-- > 0 ? 1 : 0); }
+  }
+
+  if (mcEnabled) {
+    tform.mc = pool.slice(0, mcN).map(card => {
       const prompt = flip ? card.def : card.term;
       const correct = flip ? card.term : card.def;
       const wrong = shuffle(cards.filter(c => c !== card)).slice(0, 3).map(c => flip ? c.term : c.def);
@@ -22,8 +39,8 @@ function buildTest(cards) {
     });
   } else { tform.mc = []; }
 
-  if (s.match && cards.length >= 4) {
-    const matchPool = shuffle([...cards]).slice(0, Math.min(qN, cards.length));
+  if (matchEnabled) {
+    const matchPool = shuffle([...cards]).slice(0, Math.min(matchN, cards.length));
     const shuffledDefs = shuffle([...matchPool]);
     tform.matchDefs = shuffledDefs.map((card, i) => ({
       letter: ALPHA[i], text: flip ? card.term : card.def, card
@@ -36,10 +53,10 @@ function buildTest(cards) {
     }));
   } else { tform.matchTerms = []; tform.matchDefs = []; }
 
-  if (s.written) {
+  if (writtenEnabled) {
     const inMC = new Set(tform.mc.map(q => q.card));
     const writtenPool = [...shuffle(cards.filter(c => !inMC.has(c))), ...shuffle(cards.filter(c => inMC.has(c)))];
-    tform.written = writtenPool.slice(0, qN).map(card => ({
+    tform.written = writtenPool.slice(0, writtenN).map(card => ({
       card,
       prompt: flip ? card.def : card.term,
       correctAns: flip ? card.term : card.def,
@@ -49,6 +66,14 @@ function buildTest(cards) {
 
   tform.graded = false;
   tform.scores = { mc: 0, match: 0, written: 0 };
+
+  if (s.timerEnabled) {
+    tform.timerTotal = s.timerMinutes * 60;
+    tform.timerEnd = Date.now() + s.timerMinutes * 60000;
+  } else {
+    tform.timerTotal = null;
+    tform.timerEnd = null;
+  }
 }
 
 function testSettingsHtml(cards) {
@@ -95,11 +120,23 @@ function testSettingsHtml(cards) {
           </label>
         </div>
         <div class="test-settings-footer">
-          <div class="test-setting-item test-setting-num-item">
-            <span class="test-setting-label">Questions per section</span>
-            <input type="number" class="test-setting-num-input" value="${curQ}" min="1" max="${maxQ}"
-              oninput="tform.settings.qCount=Math.min(${maxQ},Math.max(1,+this.value||1))">
-            <span class="test-setting-num-max">of ${maxQ}</span>
+          <div class="test-settings-footer-left">
+            <div class="test-setting-item test-setting-num-item">
+              <span class="test-setting-label">Questions total</span>
+              <input type="number" class="test-setting-num-input" value="${curQ}" min="1" max="${maxQ}"
+                oninput="tform.settings.qCount=Math.min(${maxQ},Math.max(1,+this.value||1))">
+              <span class="test-setting-num-max">of ${maxQ}</span>
+            </div>
+            <label class="test-setting-item test-setting-num-item">
+              <div class="test-toggle-wrap">
+                <input type="checkbox" ${s.timerEnabled ? 'checked' : ''} onchange="tform.settings.timerEnabled=this.checked">
+                <span class="test-toggle-track"></span>
+              </div>
+              <span class="test-setting-label">Timer</span>
+              <input type="number" class="test-setting-num-input" value="${s.timerMinutes}" min="1" max="120"
+                oninput="tform.settings.timerMinutes=Math.min(120,Math.max(1,+this.value||1))">
+              <span class="test-setting-num-max">min</span>
+            </label>
           </div>
           <button class="btn btn-primary" onclick="testApplySettings()">New Test</button>
         </div>
@@ -136,6 +173,7 @@ function renderTest(cards) {
         ${settingsBar}
         <div class="test-notice">Enable at least one question type in settings to build a test.</div>
       </div>`;
+    testTimerSetup();
     return;
   }
 
@@ -253,9 +291,18 @@ function renderTest(cards) {
       </div>`;
   }
 
+  const unansweredCount = tform.submitWarned
+    ? tform.mc.filter(q => q.answer === null).length +
+      tform.matchTerms.filter(t => !t.answer).length +
+      tform.written.filter(q => !q.answer || !q.answer.trim()).length
+    : 0;
+
   const submitRow = tform.graded
     ? `<button class="btn btn-ghost" onclick="testRetake()">Retake Test</button>`
-    : `<button class="btn btn-primary" onclick="gradeTest()">Submit Test</button>`;
+    : tform.submitWarned
+      ? `<div class="test-warn-banner">${unansweredCount} question${unansweredCount !== 1 ? 's' : ''} unanswered — will be marked incorrect.</div>
+         <button class="btn btn-primary" onclick="gradeTest()">Submit Anyway</button>`
+      : `<button class="btn btn-primary" onclick="gradeTest()">Submit Test</button>`;
 
   document.getElementById('main').innerHTML = `
     <div class="test-form">
@@ -268,7 +315,7 @@ function renderTest(cards) {
     </div>`;
 
   if (tform.graded) applyGradeStyles();
-  else if (tform.written.length) setTimeout(() => document.getElementById('wi_0')?.focus(), 40);
+  testTimerSetup();
 }
 
 function mcPick(qi, oi) {
@@ -287,6 +334,17 @@ function writtenType(i, val) {
 }
 
 function gradeTest() {
+  if (!tform.submitWarned) {
+    const unanswered = tform.mc.filter(q => q.answer === null).length +
+                       tform.matchTerms.filter(t => !t.answer).length +
+                       tform.written.filter(q => !q.answer || !q.answer.trim()).length;
+    if (unanswered > 0) {
+      tform.submitWarned = true;
+      renderTest(getValidCards());
+      return;
+    }
+  }
+  if (tform.timerInterval) { clearInterval(tform.timerInterval); tform.timerInterval = null; }
   tform.graded = true;
   tform.scores.mc = tform.mc.filter(q => q.answer !== null && q.opts[q.answer] === q.correctAns).length;
   tform.scores.match = tform.matchTerms.filter(t => t.answer === t.correctLetter).length;
@@ -320,3 +378,72 @@ function applyGradeStyles() {
 }
 
 function testRetake() { buildTest(getValidCards()); render(); }
+
+// ── Countdown timer ──
+function testTimerSetup() {
+  let widget = document.getElementById('testTimerWidget');
+  if (!widget) {
+    widget = document.createElement('div');
+    widget.id = 'testTimerWidget';
+    document.body.appendChild(widget);
+  }
+
+  const show = activeMode === 'test' && tform.settings.timerEnabled && !tform.graded && !!tform.timerEnd;
+  widget.style.display = show ? 'flex' : 'none';
+
+  if (tform.timerInterval) { clearInterval(tform.timerInterval); tform.timerInterval = null; }
+  if (!show) return;
+
+  const R = 26;
+  const CIRC = 2 * Math.PI * R;
+  const totalSec = tform.timerTotal || (tform.settings.timerMinutes * 60);
+  const remaining = Math.max(0, Math.round((tform.timerEnd - Date.now()) / 1000));
+  const offset = (CIRC * (1 - remaining / totalSec)).toFixed(2);
+  const warn = remaining <= 60 && remaining > 0;
+
+  widget.className = 'test-timer-widget' + (warn ? ' test-timer-warn' : '');
+  widget.innerHTML = `
+    <button class="test-timer-toggle" onclick="testTimerToggle()" title="Toggle timer">
+      ${tform.timerHidden ? '▴' : '▾'}
+    </button>
+    <div class="test-timer-body" id="testTimerBody" style="display:${tform.timerHidden ? 'none' : 'block'}">
+      <div class="test-timer-ring-wrap">
+        <svg class="test-timer-ring" viewBox="0 0 60 60">
+          <circle class="test-timer-bg" cx="30" cy="30" r="${R}"/>
+          <circle class="test-timer-arc" id="testTimerArc" cx="30" cy="30" r="${R}"
+            stroke-dasharray="${CIRC.toFixed(2)}" stroke-dashoffset="${offset}"/>
+        </svg>
+        <span class="test-timer-time" id="testTimerTime">${formatTimerTime(remaining)}</span>
+      </div>
+    </div>`;
+
+  if (remaining <= 0) { gradeTest(); return; }
+
+  tform.timerInterval = setInterval(() => {
+    const rem = Math.max(0, Math.round((tform.timerEnd - Date.now()) / 1000));
+    const el = document.getElementById('testTimerTime');
+    const arc = document.getElementById('testTimerArc');
+    if (el) el.textContent = formatTimerTime(rem);
+    if (arc) arc.setAttribute('stroke-dashoffset', (CIRC * (1 - rem / totalSec)).toFixed(2));
+    const w = document.getElementById('testTimerWidget');
+    if (w) w.classList.toggle('test-timer-warn', rem <= 60 && rem > 0);
+    if (rem <= 0) {
+      clearInterval(tform.timerInterval); tform.timerInterval = null;
+      gradeTest();
+    }
+  }, 1000);
+}
+
+function formatTimerTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return m + ':' + String(s).padStart(2, '0');
+}
+
+function testTimerToggle() {
+  tform.timerHidden = !tform.timerHidden;
+  const body = document.getElementById('testTimerBody');
+  if (body) body.style.display = tform.timerHidden ? 'none' : 'block';
+  const btn = document.querySelector('#testTimerWidget .test-timer-toggle');
+  if (btn) btn.textContent = tform.timerHidden ? '▴' : '▾';
+}

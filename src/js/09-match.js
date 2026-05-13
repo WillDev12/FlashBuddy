@@ -18,6 +18,16 @@ function buildMatch(cards) {
 }
 
 function renderMatch() {
+  if (!mt.started) {
+    document.getElementById('main').innerHTML = `
+      <div class="match-start-screen">
+        <div class="match-start-title">Match</div>
+        <div class="match-start-desc">Match each term to its definition as fast as you can.</div>
+        <button class="btn btn-primary" onclick="matchBegin()">Start Game</button>
+      </div>`;
+    return;
+  }
+
   if (!mt.cards.length) { buildMatch(getValidCards()); }
 
   if (mt.pairs === mt.total && mt.total > 0) {
@@ -108,8 +118,15 @@ function matchSelect(id) {
   }
 }
 
+function matchBegin() {
+  buildMatch(getValidCards());
+  mt.started = true;
+  render();
+}
+
 function matchRestart() {
   if (mt.timerInterval) { clearInterval(mt.timerInterval); mt.timerInterval = null; }
   buildMatch(getValidCards());
+  mt.started = true;
   render();
 }

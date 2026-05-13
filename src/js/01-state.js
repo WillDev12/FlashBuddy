@@ -36,7 +36,9 @@ const tform = {
   mc: [], matchTerms: [], matchDefs: [], written: [],
   graded: false,
   scores: { mc:0, match:0, written:0 },
-  settings: { mc: true, match: true, written: true, qCount: 10, flip: false },
+  settings: { mc: true, match: true, written: true, qCount: 10, flip: false, timerEnabled: false, timerMinutes: 5 },
   settingsOpen: false,
+  timerInterval: null, timerEnd: null, timerTotal: null, timerHidden: false,
+  submitWarned: false,
 };
-const mt = { cards: [], selected: null, pairs: 0, total: 0, errors: 0, startTime: 0, timerInterval: null };
+const mt = { cards: [], selected: null, pairs: 0, total: 0, errors: 0, startTime: 0, timerInterval: null, started: false };
