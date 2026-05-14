@@ -49,7 +49,7 @@ function downloadPage(release) {
               `${(standaloneAsset.size/1024).toFixed(0)} KB · No scraper required`)
       : dlBtn(html_url, `Download ${tag_name}`, 'GitHub release page', false),
     zipAsset
-      ? dlBtn(zipAsset.browser_download_url, `Download ${tag_name} — Scraper Included`,
+      ? dlBtn(zipAsset.browser_download_url, `Download ${tag_name} — URL Import`,
               `${(zipAsset.size/1024).toFixed(0)} KB · Includes local scraper for Quizlet URL import`)
       : '',
   ].join('\n');

@@ -8,31 +8,38 @@ The scraper server enables **URL import** from Quizlet. It runs on your local ma
 
 - [Node.js](https://nodejs.org) v18 or later
    - Download [here](https://nodejs.org/en/download), not available on ChromeOS
-- The **FlashBuddy — Scraper Included** `.zip` release
+- The **FlashBuddy — URL Import** `.zip` release
 
 ## Installation
 
-1. Download and unzip the **Scraper Included** release.
-2. Inside the unzipped folder, open the `scraper/` directory.
-3. Start the server:
-   - **Mac / Linux:** Double-click `start.sh`, or run it in a terminal:
+1. Download and unzip the **URL Import** release.
+2. Start the server from the unzipped folder:
+   - **Mac / Linux:** Open Terminal and run:
      ```bash
-     bash start.sh
+     bash /path/to/start.sh
      ```
+     You can drag `start.sh` from Finder/Files into the terminal window to fill in the path automatically.
    - **Windows:** Double-click `start.bat`.
-4. The first run downloads a bundled browser (~150 MB) — this only happens once.
-5. When you see `FlashBuddy scraper listening on http://localhost:3000`, the server is ready.
+3. The first run downloads a bundled browser (~150 MB) — this only happens once and can take 1–5 minutes.
+4. When you see `FlashBuddy scraper listening on http://localhost:3000`, the server is ready.
+
+> **macOS Gatekeeper:** If you see "cannot be opened because the developer cannot be verified", run this command on the unzipped folder and try again:
+> ```bash
+> xattr -cr /path/to/FlashBuddy-url-import
+> ```
 
 ## Usage
 
 Keep the scraper terminal window open while using FlashBuddy. You can close it when you're done importing.
 
-To start the server again later, repeat step 3.
+To start the server again later, repeat step 2.
 
 ## Troubleshooting
 
 **"node is not recognized"** — Node.js is not installed. Download it from [nodejs.org](https://nodejs.org) and retry.
 
-**Port 3000 already in use** — Another process is using port 3000. Close it or change the port by editing `scraper/server.js` (line: `const PORT = 3000`).
+**Port 3000 already in use** — Another process is using port 3000. Run the server on a different port by setting the `PORT` environment variable:
+- Mac / Linux: `PORT=3001 bash start.sh`
+- Windows: `set PORT=3001 && start.bat`
 
 **Import still fails after starting the server** — Make sure the server window shows the "listening" message before importing. If the Quizlet set is private, use the PDF import method instead.

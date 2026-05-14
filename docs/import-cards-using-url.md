@@ -1,10 +1,10 @@
 # Import from Quizlet URL
 
-This method automatically scrapes a Quizlet set using a local browser. It requires the **Scraper Included** release and Node.js installed on your machine.
+This method automatically scrapes a Quizlet set using a local browser. It requires the **URL Import** release and Node.js installed on your machine.
 
 ## Requirements
 
-- **FlashBuddy — Scraper Included** (the `.zip` release)
+- **FlashBuddy — URL Import** (the `.zip` release)
 - [Node.js](https://nodejs.org) v18 or later
 
 ## Setup

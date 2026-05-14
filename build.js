@@ -87,24 +87,29 @@ async function build() {
   fs.writeFileSync(standaloneOut, standaloneHtml);
   console.log(`[${t}] Built → dist/standalone/FlashBuddy-standalone.html (${(standaloneHtml.length / 1024).toFixed(1)} KB)`);
 
-  // ── Scraper Included ──
-  const scraperDir = path.join(DIST, 'scraper-included');
+  // ── URL Import ──
+  const scraperDir = path.join(DIST, 'url-import');
   fs.mkdirSync(scraperDir, { recursive: true });
   const scraperHtml = await buildHtml('http://localhost:3000');
-  const zipOut      = path.join(scraperDir, 'FlashBuddy-scraper-included.zip');
+  const zipOut      = path.join(scraperDir, 'FlashBuddy-url-import.zip');
 
   await zip(zipOut, archive => {
     // Main app
     archive.append(scraperHtml, { name: 'FlashBuddy.html' });
-    // Scraper files (exclude node_modules and lock file)
-    for (const file of ['server.js', 'package.json', 'start.sh', 'start.bat']) {
+    // Start scripts and README at root (alongside FlashBuddy.html)
+    for (const file of ['start.sh', 'start.bat', 'README.txt']) {
+      const p = path.join(SCRAPER, file);
+      if (fs.existsSync(p)) archive.file(p, { name: file });
+    }
+    // Scraper server files in ./scraper/
+    for (const file of ['server.js', 'views.js', 'favicon.png', 'package.json']) {
       const p = path.join(SCRAPER, file);
       if (fs.existsSync(p)) archive.file(p, { name: `scraper/${file}` });
     }
   });
 
   const zipSize = (fs.statSync(zipOut).size / 1024).toFixed(1);
-  console.log(`[${t}] Built → dist/scraper-included/FlashBuddy-scraper-included.zip (${zipSize} KB)`);
+  console.log(`[${t}] Built → dist/url-import/FlashBuddy-url-import.zip (${zipSize} KB)`);
 }
 
 build().catch(e => { console.error('Build error:', e.message); process.exit(1); });

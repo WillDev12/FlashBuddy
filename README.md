@@ -17,7 +17,7 @@ A standalone, single-file flashcard study app. No accounts, no tracking, no inte
 - **Learn** — adaptive MC + typing rounds in spaced sections
 - **Test** — configurable exam with multiple choice, matching, and written responses; flip terms/definitions; set question count
 - **Match** — timed drag-and-drop matching game
-- **Quizlet import** — import by URL (requires scraper) or paste an export string directly
+- **Quizlet import** — import by URL (requires URL Import release) or paste an export string directly
 - **Offline support** — works fully offline; internet-only features are gracefully disabled
 - **Auto-update check** — notifies you when a new release is posted to GitHub
 
@@ -31,6 +31,9 @@ Download the latest `FlashBuddy-standalone.html` from the [releases page](https:
 - [Import cards by URL](docs/import-cards-using-url.md)
 - [Import cards from PDF](docs/import-cards-using-pdf.md)
 - [Set up the scraper server](docs/setup-scraper-server.md)
+- [FAQ](docs/faq.md)
+
+See [CHANGELOG.md](CHANGELOG.md) for what's new in each release.
 
 ## Development
 

@@ -4,7 +4,7 @@
 
 Download `Flashbuddy vx.x.x -- Standalone` from the [download page](download) and open it in any browser. No install, no account, no internet required.
 
-*For details on how to install the Scraper Included release, see [Setting up the Scraper Server](setup-scraper-server).*
+*For details on how to install the URL Import release, see [Setting up the Scraper Server](setup-scraper-server).*
 
 ## Creating a Deck
 
@@ -47,6 +47,22 @@ FlashBuddy supports several import methods:
 - **By URL** — requires the scraper server. See [Import by URL](import-cards-using-url).
 - **By PDF** — save a Quizlet set as a PDF and upload it. See [Import via PDF](import-cards-using-pdf).
 - **Paste export string** — copy a Quizlet export string and paste it directly into the import field in the deck editor.
+
+## Browser Compatibility
+
+FlashBuddy works in Chrome, Firefox, Edge, Safari, and Chromium-based browsers (Brave, Arc, Opera). Mobile browsers work for studying; the deck editor is best on desktop.
+
+ChromeOS users: URL import (scraper) is not supported. Use the [PDF import method](import-cards-using-pdf) instead.
+
+## Backing Up Your Decks
+
+Your decks are saved in the browser's local storage — they don't sync to a server and can be lost if you clear browser data. To back up:
+
+1. Open **Manage**.
+2. Click **Export All** to save a `.json` file with all your decks.
+3. To restore, click **Import File** and select the backup.
+
+Export regularly if you have decks you can't afford to lose.
 
 ## Bookmarking FlashBuddy
 

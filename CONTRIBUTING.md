@@ -37,8 +37,4 @@ The build output is a single self-contained `index.html` (and a copy at `dist/st
 
 ## Releasing (maintainers only)
 
-1. Bump `APP_VERSION` in `src/js/01-state.js` and `version` in `package.json`.
-2. Update `CHANGELOG.md`.
-3. Run `npm run build` to verify.
-4. Push a tag (`git tag vX.Y.Z && git push origin vX.Y.Z`).
-5. The release workflow attaches the standalone HTML automatically.
+See the **Publishing a release** section in [README.md](README.md).

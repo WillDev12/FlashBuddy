@@ -2,9 +2,12 @@ const express = require('express');
 const path    = require('path');
 const fs      = require('fs');
 const { esc, downloadPage, errorPage, docsIndexPage, docsPage } = require('./views');
+const puppeteerExtra = require('puppeteer-extra');
+const StealthPlugin  = require('puppeteer-extra-plugin-stealth');
+puppeteerExtra.use(StealthPlugin());
 
 const app  = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const GITHUB_REPO = 'WillDev12/FlashBuddy';
 const DOCS_DIR    = path.join(__dirname, '../docs');
 
@@ -36,9 +39,8 @@ app.get('/scrape', async (req, res) => {
   let browser;
   try {
     send('log', { msg: 'Launching browser…' });
-    const puppeteer = require('puppeteer');
-    browser = await puppeteer.launch({
-      headless: true,
+    browser = await puppeteerExtra.launch({
+      headless: 'new',
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-blink-features=AutomationControlled'],
     });
 
@@ -52,7 +54,7 @@ app.get('/scrape', async (req, res) => {
     });
 
     try {
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
     } catch (e) {
       if (!e.message.includes('timeout')) throw e;
     }
@@ -62,35 +64,113 @@ app.get('/scrape', async (req, res) => {
         document.querySelector(sel)?.click();
     });
 
-    send('log', { msg: 'Waiting for cards to appear…' });
-    await page.waitForSelector('[aria-label="Term"]', { timeout: 30000 });
+    // Fast path: extract cards from Quizlet's embedded JS state
+    send('log', { msg: 'Trying fast extraction…' });
+    const fastCards = await page.evaluate(() => {
+      try {
+        // Next.js page data
+        const nd = window.__NEXT_DATA__?.props?.pageProps;
+        const sets = nd?.dehydratedReduxStateKey
+          ? JSON.parse(nd.dehydratedReduxStateKey)
+          : nd?.queryData;
 
-    send('log', { msg: 'Scraping…' });
-    const seen = new Map();
+        const findCards = (obj, depth = 0) => {
+          if (depth > 8 || !obj || typeof obj !== 'object') return null;
+          // Quizlet studiableItems / terms array
+          for (const key of ['studiableItems', 'terms', 'flashcards']) {
+            if (Array.isArray(obj[key]) && obj[key].length > 0 && obj[key][0]?.cardSides) {
+              return obj[key].map(item => {
+                const sides = item.cardSides;
+                const term = sides?.find(s => s.label === 0 || s.label === 'word')?.media?.[0]?.plainText ?? sides?.[0]?.media?.[0]?.plainText ?? '';
+                const def  = sides?.find(s => s.label === 1 || s.label === 'definition')?.media?.[0]?.plainText ?? sides?.[1]?.media?.[0]?.plainText ?? '';
+                return { term: term.trim(), def: def.trim() };
+              }).filter(c => c.term && c.def);
+            }
+          }
+          for (const val of Object.values(obj)) {
+            const result = findCards(val, depth + 1);
+            if (result && result.length > 0) return result;
+          }
+          return null;
+        };
 
-    const collectPage = () => page.evaluate(() => {
-      return Array.from(document.querySelectorAll('[aria-label="Term"]')).map(item => {
-        const sides = item.querySelectorAll('[data-testid="set-page-term-card-side"]');
-        const term = sides[0]?.querySelector('.TermText')?.textContent?.trim() ?? '';
-        const def  = sides[1]?.querySelector('.TermText')?.textContent?.trim() ?? '';
-        return { term, def };
-      }).filter(c => c.term && c.def);
+        const fromState = sets ? findCards(sets) : null;
+        if (fromState && fromState.length > 0) return fromState;
+
+        // Inline JSON script tags
+        for (const script of document.querySelectorAll('script[type="application/json"], script#__NEXT_DATA__')) {
+          try {
+            const data = JSON.parse(script.textContent);
+            const result = findCards(data);
+            if (result && result.length > 0) return result;
+          } catch {}
+        }
+      } catch {}
+      return null;
     });
 
-    let stable = 0, lastReported = 0;
-    while (stable < 4) {
-      const batch = await collectPage();
-      const before = seen.size;
-      batch.forEach(c => { if (!seen.has(c.term)) seen.set(c.term, c); });
-      stable = seen.size === before ? stable + 1 : 0;
-      if (seen.size !== lastReported && seen.size > 0) {
-        send('log', { msg: `Scraping… ${seen.size} cards collected` });
-        lastReported = seen.size;
+    const seen = new Map();
+
+    if (fastCards && fastCards.length > 0) {
+      fastCards.forEach(c => seen.set(c.term, c));
+      send('log', { msg: `Scraping… ${seen.size} cards collected` });
+    } else {
+      // Slow path: wait for DOM rendering and scroll-collect
+      send('log', { msg: 'Fast extraction failed, waiting for DOM…' });
+      await page.waitForFunction(
+        () => !!document.querySelector('.TermText, [aria-label="Term"], [data-testid="set-page-term-card-side"]'),
+        { timeout: 90000 }
+      );
+
+      send('log', { msg: 'Scraping…' });
+
+      const collectPage = () => page.evaluate(() => {
+        const byAriaLabel = Array.from(document.querySelectorAll('[aria-label="Term"]')).map(item => {
+          const sides = item.querySelectorAll('[data-testid="set-page-term-card-side"]');
+          const term = sides[0]?.querySelector('.TermText')?.textContent?.trim() ?? '';
+          const def  = sides[1]?.querySelector('.TermText')?.textContent?.trim() ?? '';
+          return { term, def };
+        }).filter(c => c.term && c.def);
+        if (byAriaLabel.length > 0) return byAriaLabel;
+
+        const sides = Array.from(document.querySelectorAll('[data-testid="set-page-term-card-side"]'));
+        const byTestId = [];
+        for (let i = 0; i + 1 < sides.length; i += 2) {
+          const term = sides[i].querySelector('.TermText')?.textContent?.trim() ?? '';
+          const def  = sides[i + 1].querySelector('.TermText')?.textContent?.trim() ?? '';
+          if (term && def) byTestId.push({ term, def });
+        }
+        if (byTestId.length > 0) return byTestId;
+
+        const texts = Array.from(document.querySelectorAll('.TermText'));
+        const byTermText = [];
+        for (let i = 0; i + 1 < texts.length; i += 2) {
+          const term = texts[i].textContent?.trim() ?? '';
+          const def  = texts[i + 1].textContent?.trim() ?? '';
+          if (term && def) byTermText.push({ term, def });
+        }
+        return byTermText;
+      });
+
+      let stable = 0, lastReported = 0;
+      while (stable < 3) {
+        const batch = await collectPage();
+        const before = seen.size;
+        batch.forEach(c => { if (!seen.has(c.term)) seen.set(c.term, c); });
+        const atBottom = await page.evaluate(
+          () => (window.innerHeight + window.scrollY) >= document.body.scrollHeight - 50
+        );
+        stable = (seen.size === before || atBottom) ? stable + 1 : 0;
+        if (seen.size !== lastReported && seen.size > 0) {
+          send('log', { msg: `Scraping… ${seen.size} cards collected` });
+          lastReported = seen.size;
+        }
+        if (atBottom && seen.size === before) break;
+        await page.evaluate(() => window.scrollBy(0, window.innerHeight * 2));
+        await new Promise(r => setTimeout(r, 800));
       }
-      await page.evaluate(() => window.scrollBy(0, window.innerHeight * 2));
-      await new Promise(r => setTimeout(r, 500));
+      (await collectPage()).forEach(c => { if (!seen.has(c.term)) seen.set(c.term, c); });
     }
-    (await collectPage()).forEach(c => { if (!seen.has(c.term)) seen.set(c.term, c); });
 
     const cards = [...seen.values()];
     if (cards.length === 0) {

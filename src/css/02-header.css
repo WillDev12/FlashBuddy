@@ -30,6 +30,38 @@
     }
     .update-banner-close:hover { opacity: 1; }
 
+/* ── WELCOME BANNER ── */
+    .welcome-banner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 20px;
+      background: var(--surface2);
+      border-bottom: 1.5px solid var(--border);
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink2);
+    }
+    .welcome-banner.hidden { display: none; }
+    .welcome-banner-text { flex: 1; }
+    .welcome-banner-link { color: var(--accent); text-decoration: none; white-space: nowrap; font-weight: 700; }
+    .welcome-banner-link:hover { text-decoration: underline; }
+    .welcome-banner-close {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      color: var(--ink2);
+      font-family: 'Nunito', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 10px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .welcome-banner-close:hover { border-color: var(--accent); color: var(--accent); }
+
 /* ── HEADER ── */
     header {
       background: var(--surface);
@@ -142,3 +174,18 @@
       color: var(--accent);
       box-shadow: var(--shadow-sm);
     }
+
+    .help-link {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      color: var(--ink3);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none;
+      flex-shrink: 0;
+      transition: all 0.18s;
+    }
+    .help-link:hover { border-color: var(--accent); color: var(--accent); background: var(--surface); }

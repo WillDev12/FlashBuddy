@@ -156,7 +156,7 @@ function doQuizletImport() {
 
   if (!SCRAPER_URL) {
     status.className = 'import-status err';
-    status.textContent = 'URL import requires the scraper server — download the Scraper Included release.';
+    status.innerHTML = 'URL import requires the URL Import release. <a href="https://flashbuddy.vercel.app/docs/setup-scraper-server" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Setup guide →</a>';
     return;
   }
 
@@ -207,7 +207,9 @@ function doQuizletImport() {
 
   es.onerror = () => {
     es.close();
-    finalizeLog('Could not reach scraper. Run: cd scraper && npm start', 'err');
+    finalizeLog('Could not reach scraper server — is it running?', 'err');
+    status.className = 'import-status err';
+    status.innerHTML = 'Scraper not running. <a href="https://flashbuddy.vercel.app/docs/setup-scraper-server" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Setup guide →</a>';
   };
 
   es.onmessage = (e) => {

@@ -28,4 +28,4 @@ jobs:
         with:
           files: |
             dist/standalone/FlashBuddy-standalone.html
-            dist/scraper-included/FlashBuddy-scraper-included.zip
+            dist/url-import/FlashBuddy-url-import.zip

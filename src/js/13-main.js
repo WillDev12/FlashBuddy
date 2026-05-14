@@ -79,6 +79,11 @@ function dismissUpdate() {
   document.getElementById('updateBanner').classList.add('hidden');
 }
 
+function dismissWelcome() {
+  document.getElementById('welcomeBanner').classList.add('hidden');
+  localStorage.setItem('flashbuddy_welcomed', '1');
+}
+
 // ══════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════
@@ -100,3 +105,17 @@ if (!SCRAPER_URL) {
   if (!navigator.onLine) setTimeout(() => toast('No internet connection — some features disabled', 4000), 400);
 }
 checkForUpdate();
+
+// Help link
+const helpLink = document.getElementById('helpLink');
+if (helpLink) {
+  const docsUrl = SCRAPER_URL ? `${SCRAPER_URL}/docs` : 'https://flashbuddy.vercel.app/docs';
+  helpLink.href = docsUrl;
+  const welcomeDocsLink = document.getElementById('welcomeDocsLink');
+  if (welcomeDocsLink) welcomeDocsLink.href = docsUrl;
+}
+
+// First-time welcome banner
+if (!localStorage.getItem('flashbuddy_welcomed')) {
+  document.getElementById('welcomeBanner').classList.remove('hidden');
+}

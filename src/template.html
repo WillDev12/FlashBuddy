@@ -33,12 +33,19 @@
     <button class="mode-tab" role="tab" aria-selected="false" data-mode="test" onclick="switchMode('test')">Test</button>
     <button class="mode-tab" role="tab" aria-selected="false" data-mode="match" onclick="switchMode('match')">Match</button>
   </div>
+  <a class="help-link" id="helpLink" href="#" target="_blank" rel="noopener" aria-label="Help and documentation">?</a>
 </header>
 
 <div class="update-banner hidden" id="updateBanner">
   <span class="update-banner-text">Update available — <strong id="updateBannerTag"></strong></span>
   <a class="update-banner-link" id="updateBannerLink" href="#" target="_blank" rel="noopener">View on GitHub →</a>
   <button class="update-banner-close" onclick="dismissUpdate()" aria-label="Dismiss update">×</button>
+</div>
+
+<div class="welcome-banner hidden" id="welcomeBanner">
+  <span class="welcome-banner-text">Welcome to FlashBuddy! Click <strong>Manage → + New Deck</strong> to get started, or import from Quizlet.</span>
+  <a class="welcome-banner-link" id="welcomeDocsLink" href="#" target="_blank" rel="noopener">Docs →</a>
+  <button class="welcome-banner-close" onclick="dismissWelcome()" aria-label="Dismiss welcome">Got it</button>
 </div>
 
 <main id="main"></main>
