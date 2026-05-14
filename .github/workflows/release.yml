@@ -23,9 +23,13 @@ jobs:
 
       - run: npm run build
 
+      - name: Extract release notes from CHANGELOG
+        run: awk '/^## \[/{if(p) exit; p=1; next} p' CHANGELOG.md > release_notes.txt
+
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
+          body_path: release_notes.txt
           files: |
             dist/standalone/FlashBuddy-standalone.html
             dist/url-import/FlashBuddy-url-import.zip
