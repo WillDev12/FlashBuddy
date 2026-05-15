@@ -5,7 +5,10 @@ const ALPHA = 'ABCDEFGHIJKLMNOP';
 
 function buildTest(cards) {
   if (!cards || !cards.length) {
-    tform.mc = []; tform.matchTerms = []; tform.matchDefs = []; tform.written = []; return;
+    tform.mc = []; tform.matchTerms = []; tform.matchDefs = []; tform.written = [];
+    if (tform.timerInterval) { clearInterval(tform.timerInterval); tform.timerInterval = null; }
+    tform.timerEnd = null;
+    return;
   }
 
   if (tform.timerInterval) { clearInterval(tform.timerInterval); tform.timerInterval = null; }

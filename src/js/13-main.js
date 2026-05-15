@@ -109,7 +109,7 @@ checkForUpdate();
 // Help link
 const helpLink = document.getElementById('helpLink');
 if (helpLink) {
-  const docsUrl = SCRAPER_URL ? `${SCRAPER_URL}/docs` : 'https://flashbuddy.vercel.app/docs';
+  const docsUrl = 'https://flashbuddy.vercel.app/docs';
   helpLink.href = docsUrl;
   const welcomeDocsLink = document.getElementById('welcomeDocsLink');
   if (welcomeDocsLink) welcomeDocsLink.href = docsUrl;

@@ -105,6 +105,7 @@
       gap: 10px;
       flex: 1;
       min-width: 0;
+      overflow: hidden;
     }
 
     .deck-selector-wrap {
@@ -150,7 +151,9 @@
       background: var(--surface2);
       padding: 4px;
       border-radius: 10px;
-      flex-shrink: 0;
+      flex-shrink: 1;
+      min-width: 0;
+      overflow: hidden;
     }
 
     .mode-tab {
@@ -165,6 +168,7 @@
       cursor: pointer;
       transition: all 0.2s;
       white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .mode-tab:hover { color: var(--ink); }
@@ -189,3 +193,29 @@
       transition: all 0.18s;
     }
     .help-link:hover { border-color: var(--accent); color: var(--accent); background: var(--surface); }
+
+    @media (max-width: 860px) {
+      header { padding: 0 16px; gap: 12px; }
+      .mode-tab { padding: 6px 11px; }
+      .deck-selector-wrap { min-width: 130px; }
+    }
+
+    @media (max-width: 720px) {
+      .deck-select-group .btn-sm { display: none; }
+      .deck-selector-wrap { min-width: 110px; }
+      .mode-tab { padding: 6px 9px; }
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 0 10px; gap: 8px; }
+      .logo span:last-child { display: none; }
+      .logo { gap: 0; }
+      .header-divider { display: none; }
+      .mode-tab { padding: 6px 7px; font-size: 12px; }
+      .deck-selector-wrap { min-width: 80px; max-width: 140px; }
+    }
+
+    @media (max-width: 420px) {
+      .mode-tabs { gap: 2px; padding: 3px; }
+      .mode-tab { padding: 5px 5px; font-size: 11px; }
+    }
