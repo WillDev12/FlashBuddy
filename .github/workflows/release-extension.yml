@@ -24,7 +24,7 @@ jobs:
       - run: npm run build
 
       - name: Extract release notes from CHANGELOG
-        run: awk '/^## ext-\[/{if(p) exit; p=1; next} p' CHANGELOG.md > release_notes.txt
+        run: awk '/^## ext-\[/{p=1; next} /^## /{if(p) exit} p' CHANGELOG.md > release_notes.txt
 
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
