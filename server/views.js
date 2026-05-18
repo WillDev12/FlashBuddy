@@ -32,7 +32,7 @@ ${css ?? ''}
 }
 const shellEnd = `</div></body></html>`;
 
-function releaseCard(label, release, assetFilter, assetSub, desc) {
+function releaseCard(label, release, assetFilter, assetSub) {
   const dlBtn = (href, btnLabel, sub, dl = true) =>
     `<a class="dl-btn" href="${esc(href)}"${dl ? ' download' : ''} target="_blank" rel="noopener">
       <span>${esc(btnLabel)}</span><span class="sub">${esc(sub)}</span></a>`;
@@ -55,7 +55,6 @@ function releaseCard(label, release, assetFilter, assetSub, desc) {
   return `<div class="rel-card">
     <div class="label">${esc(label)}</div>
     <h2>${esc(tag_name)}</h2>
-    ${desc ? `<p class="rel-desc">${esc(desc)}</p>` : ''}
     <div class="date">Released ${date}</div>
     ${link}
     ${notes}
@@ -77,14 +76,13 @@ function downloadPage(appRelease, extRelease) {
     .notes{font-size:12px;color:#555;background:#f7f8fc;border:1px solid #e4e8f4;border-radius:6px;
            padding:14px;margin-top:16px;white-space:pre-wrap;word-break:break-word;
            max-height:180px;overflow-y:auto;line-height:1.6}
-    .rel-desc{font-size:13px;color:#555;margin-bottom:14px;line-height:1.5}
     .no-release{font-size:13px;color:#8891b0;margin:0}
     .bottom-links{display:flex;justify-content:center;align-items:center;gap:1.5rem;margin-top:4px}
     .gh-link,.docs-link{font-size:13px;color:#8891b0;text-decoration:none}
     .gh-link:hover,.docs-link:hover{color:#555}
   `, 'FlashBuddy - Download') +
   releaseCard('FlashBuddy',        appRelease, a => a.name.endsWith('.html'), 'Standalone · no setup required') +
-  releaseCard('FlashBuddy Extras', extRelease, a => a.name.endsWith('.zip'),  'Chrome extension · install manually', 'The Chrome extension counterpart to FlashBuddy — import Quizlet decks directly into the app.') +
+  releaseCard('FlashBuddy Extras', extRelease, a => a.name.endsWith('.zip'),  'Chrome extension · install manually') +
   `<div class="bottom-links">
     <a class="gh-link" href="https://github.com/${esc(GITHUB_REPO)}" target="_blank" rel="noopener">View on GitHub →</a>
     <a href="https://github.com/${esc(GITHUB_REPO)}" target="_blank" rel="noopener"><img src="https://img.shields.io/github/stars/${esc(GITHUB_REPO)}?style=social" alt="GitHub stars" style="vertical-align:middle"></a>

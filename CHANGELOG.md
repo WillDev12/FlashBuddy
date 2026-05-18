@@ -1,5 +1,13 @@
 # Changelog
 
+## ext-[1.0.0] - 2026-05-18
+- Initial release of FlashBuddy Extras
+- Scrapes any public Quizlet deck in-page and sends cards directly to FlashBuddy — no server required
+- Auto-expands "See N more" sections to capture full decks (100+ cards)
+- Adapts to Quizlet light/dark theme
+- Supports SPA navigation — switching decks updates the panel without closing it
+- Export string delimiter controls in the preview panel
+
 ## [2.0.0] - 2026-05-18
 - Replace URL import (local scraper server) with FlashBuddy Extras Chrome extension — no Node.js or local server required
 - New Chrome extension scrapes Quizlet decks in-page and sends cards directly to FlashBuddy via browser messaging
