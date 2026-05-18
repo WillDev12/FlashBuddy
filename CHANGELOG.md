@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.0.0] - 2026-05-18
+- Replace URL import (local scraper server) with FlashBuddy Extras Chrome extension — no Node.js or local server required
+- New Chrome extension scrapes Quizlet decks in-page and sends cards directly to FlashBuddy via browser messaging
+- Extension auto-expands "See N more" sections to capture full decks (100+ cards)
+- Extension UI adapts to Quizlet light/dark theme
+- Extension supports SPA navigation — switching decks updates the panel without closing it
+- Export string delimiter controls added to extension panel
+- Deck editor shows extension connection status with install link when not detected
+- Rename `scraper/` to `server/` — local server is now the web backend only, not a user-facing tool
+- Separate GitHub release pipelines: `v*` tags publish `FlashBuddy-standalone.html`, `ext-v*` tags publish `FlashBuddy-extension.zip`
+- Download page shows latest program and extension releases independently
+- Docs: rewrote import guide for extension workflow, added extension install guide, updated FAQ and usage guide
+
 ## [1.2.0] - 2026-05-14
 - Scraper: significantly faster import times — average reduced from 5–10 minutes to under 20 seconds
 - Rename "Scraper Included" release to "URL Import" for clarity

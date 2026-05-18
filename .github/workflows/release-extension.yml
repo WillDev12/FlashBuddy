@@ -1,9 +1,9 @@
-name: Release — FlashBuddy
+name: Release — FlashBuddy Extras
 
 on:
   push:
     tags:
-      - 'v[0-9]*'
+      - 'ext-v*'
 
 jobs:
   build-and-release:
@@ -23,12 +23,8 @@ jobs:
 
       - run: npm run build
 
-      - name: Extract release notes from CHANGELOG
-        run: awk '/^## \[/{if(p) exit; p=1; next} p' CHANGELOG.md > release_notes.txt
-
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
-          body_path: release_notes.txt
           files: |
-            dist/standalone/FlashBuddy-standalone.html
+            dist/extension/FlashBuddy-extension.zip

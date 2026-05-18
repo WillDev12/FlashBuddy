@@ -22,26 +22,8 @@ document.addEventListener('keydown', e => {
 // ══════════════════════════════════════════════
 //  CONNECTIVITY
 // ══════════════════════════════════════════════
-function setOnlineUI(online) {
-  const notice = document.getElementById('quizletOfflineNotice');
-  const input  = document.getElementById('quizletUrl');
-  const btn    = document.getElementById('quizletImportBtn');
-  if (notice) notice.classList.toggle('hidden', online);
-  if (input)  input.disabled  = !online;
-  if (btn)    btn.disabled    = !online;
-}
-
-window.addEventListener('offline', () => {
-  if (!SCRAPER_URL) return;
-  toast('No internet connection — some features disabled', 4000);
-  setOnlineUI(false);
-});
-
-window.addEventListener('online', () => {
-  if (!SCRAPER_URL) return;
-  toast('Back online ✓');
-  setOnlineUI(true);
-});
+window.addEventListener('offline', () => toast('No internet connection — some features disabled', 4000));
+window.addEventListener('online',  () => toast('Back online ✓'));
 
 // ══════════════════════════════════════════════
 //  UPDATE CHECK
@@ -85,6 +67,40 @@ function dismissWelcome() {
 }
 
 // ══════════════════════════════════════════════
+//  BROWSER EXTENSION
+// ══════════════════════════════════════════════
+function updateExtStatus(connected) {
+  const dot  = document.getElementById('extStatusDot');
+  const text = document.getElementById('extStatusText');
+  const hint = document.getElementById('extHint');
+  if (!dot || !text) return;
+  if (connected) {
+    dot.className = 'ext-status-dot connected';
+    text.textContent = 'Extension connected';
+    if (hint) hint.innerHTML = 'Open a Quizlet deck and click the FlashBuddy button to import.';
+  } else {
+    dot.className = 'ext-status-dot';
+    text.textContent = 'Extension not detected';
+    if (hint) hint.innerHTML = 'Install the FlashBuddy extension to use this feature. <a href="https://flashbuddy.vercel.app/docs/install-extension" target="_blank" rel="noopener" style="color:var(--accent)">Get extension →</a>';
+  }
+}
+
+window.addEventListener('message', e => {
+  if (!e.data || typeof e.data !== 'object') return;
+  if (e.data.type === 'FLASHBUDDY_EXT_INSTALLED') {
+    extInstalled = true;
+    updateExtStatus(true);
+  } else if (e.data.type === 'FLASHBUDDY_IMPORT_DECK') {
+    const { name, cards } = e.data;
+    if (!Array.isArray(cards) || !cards.length) return;
+    openEditor(null);
+    if (name) document.getElementById('deckNameInput').value = name;
+    populateRows(cards);
+    toast(`Imported ${cards.length} card${cards.length !== 1 ? 's' : ''} from extension ✓`);
+  }
+});
+
+// ══════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════
 storeLoad();
@@ -96,23 +112,16 @@ if (ids.length) {
   resetAllModes();
 }
 render();
-if (!SCRAPER_URL) {
-  const notice = document.getElementById('quizletOfflineNotice');
-  if (notice) notice.textContent = 'URL import not available in standalone mode';
-  setOnlineUI(false);
-} else {
-  setOnlineUI(navigator.onLine);
-  if (!navigator.onLine) setTimeout(() => toast('No internet connection — some features disabled', 4000), 400);
-}
+if (!navigator.onLine) setTimeout(() => toast('No internet connection — some features disabled', 4000), 400);
+
 checkForUpdate();
 
-// Help link
+// Help link always points to Vercel docs
 const helpLink = document.getElementById('helpLink');
 if (helpLink) {
-  const docsUrl = 'https://flashbuddy.vercel.app/docs';
-  helpLink.href = docsUrl;
+  helpLink.href = 'https://flashbuddy.vercel.app/docs';
   const welcomeDocsLink = document.getElementById('welcomeDocsLink');
-  if (welcomeDocsLink) welcomeDocsLink.href = docsUrl;
+  if (welcomeDocsLink) welcomeDocsLink.href = 'https://flashbuddy.vercel.app/docs';
 }
 
 // First-time welcome banner

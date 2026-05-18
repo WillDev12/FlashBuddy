@@ -1,9 +1,8 @@
 // ══════════════════════════════════════════════
 //  CONFIG  — fill in before publishing
 // ══════════════════════════════════════════════
-const APP_VERSION = '1.1.4';
+const APP_VERSION = '2.0.0';
 const GITHUB_REPO = 'WillDev12/FlashBuddy';
-const SCRAPER_URL = 'http://localhost:3000';
 
 // ══════════════════════════════════════════════
 //  STATE
@@ -12,6 +11,7 @@ let decks = {};          // { id: { name, cards: [{term,def}] } }
 let activeDeckId = null;
 let activeMode = 'flashcards';
 let editingId = null;
+let extInstalled = false;
 
 // Per-mode state
 const fc = { idx: 0, flipped: false, order: [] };

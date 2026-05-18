@@ -32,57 +32,63 @@ ${css ?? ''}
 }
 const shellEnd = `</div></body></html>`;
 
-function downloadPage(release) {
-  const { tag_name, published_at, body, html_url, assets } = release;
-  const date = new Date(published_at).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
-
-  const standaloneAsset = assets.find(a => a.name.endsWith('.html'));
-  const zipAsset        = assets.find(a => a.name.endsWith('.zip'));
-
-  const dlBtn = (href, label, sub, dl = true) =>
+function releaseCard(label, release, assetFilter, assetSub, desc) {
+  const dlBtn = (href, btnLabel, sub, dl = true) =>
     `<a class="dl-btn" href="${esc(href)}"${dl ? ' download' : ''} target="_blank" rel="noopener">
-      <span>${esc(label)}</span><span class="sub">${esc(sub)}</span></a>`;
+      <span>${esc(btnLabel)}</span><span class="sub">${esc(sub)}</span></a>`;
 
-  const links = [
-    standaloneAsset
-      ? dlBtn(standaloneAsset.browser_download_url, `Download ${tag_name} — Standalone`,
-              `${(standaloneAsset.size/1024).toFixed(0)} KB · No scraper required`)
-      : dlBtn(html_url, `Download ${tag_name}`, 'GitHub release page', false),
-    zipAsset
-      ? dlBtn(zipAsset.browser_download_url, `Download ${tag_name} — URL Import`,
-              `${(zipAsset.size/1024).toFixed(0)} KB · Includes local scraper for Quizlet URL import`)
-      : '',
-  ].join('\n');
+  if (!release) {
+    return `<div class="rel-card">
+      <div class="label">${esc(label)}</div>
+      <p class="no-release">No release published yet.</p>
+    </div>`;
+  }
 
+  const { tag_name, published_at, body, html_url, assets } = release;
+  const date  = new Date(published_at).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+  const asset = assets.find(assetFilter);
+  const link  = asset
+    ? dlBtn(asset.browser_download_url, `Download ${tag_name}`, `${(asset.size/1024).toFixed(0)} KB · ${assetSub}`)
+    : dlBtn(html_url, `Download ${tag_name}`, 'GitHub release page', false);
   const notes = body ? `<pre class="notes">${esc(body.trim())}</pre>` : '';
 
+  return `<div class="rel-card">
+    <div class="label">${esc(label)}</div>
+    <h2>${esc(tag_name)}</h2>
+    ${desc ? `<p class="rel-desc">${esc(desc)}</p>` : ''}
+    <div class="date">Released ${date}</div>
+    ${link}
+    ${notes}
+  </div>`;
+}
+
+function downloadPage(appRelease, extRelease) {
   return shell(`
-    .label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8891b0;margin-bottom:10px}
-    h1{font-size:30px;font-weight:700;margin-bottom:4px}
-    .date{font-size:13px;color:#8891b0;margin-bottom:28px}
+    h2{font-size:24px;font-weight:700;margin-bottom:4px}
+    .label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8891b0;margin-bottom:8px}
+    .date{font-size:13px;color:#8891b0;margin-bottom:20px}
+    .rel-card{background:#fff;border:1px solid #dde2f0;border-radius:14px;padding:32px;
+              box-shadow:0 4px 20px rgba(0,0,0,.08);margin-bottom:20px}
     .dl-btn{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;
             background:#1a1a2e;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;
             font-size:14px;margin-bottom:8px;transition:background .15s}
     .dl-btn:hover{background:#2d2d4e}
     .sub{font-size:12px;opacity:.55;font-family:monospace;font-weight:400;text-align:right;max-width:55%}
     .notes{font-size:12px;color:#555;background:#f7f8fc;border:1px solid #e4e8f4;border-radius:6px;
-           padding:14px;margin-top:20px;white-space:pre-wrap;word-break:break-word;
+           padding:14px;margin-top:16px;white-space:pre-wrap;word-break:break-word;
            max-height:180px;overflow-y:auto;line-height:1.6}
-    .bottom-links{display:flex;justify-content:center;align-items:center;gap:1.5rem;margin-top:18px}
+    .rel-desc{font-size:13px;color:#555;margin-bottom:14px;line-height:1.5}
+    .no-release{font-size:13px;color:#8891b0;margin:0}
+    .bottom-links{display:flex;justify-content:center;align-items:center;gap:1.5rem;margin-top:4px}
     .gh-link,.docs-link{font-size:13px;color:#8891b0;text-decoration:none}
     .gh-link:hover,.docs-link:hover{color:#555}
-  `, 'FlashBuddy - Download') + `
-  <div class="card">
-    <div class="label">FlashBuddy</div>
-    <h1>${esc(tag_name)}</h1>
-    <div class="date">Released ${date}</div>
-    ${links}
-    ${notes}
-    <div class="bottom-links">
-      <a class="gh-link" href="https://github.com/${esc(GITHUB_REPO)}" target="_blank" rel="noopener">View on GitHub →</a>
-      <a href="https://github.com/${esc(GITHUB_REPO)}" target="_blank" rel="noopener"><img src="https://img.shields.io/github/stars/${esc(GITHUB_REPO)}?style=social" alt="GitHub stars" style="vertical-align:middle"></a>
-      <a class="docs-link" href="/docs">How to Use →</a>
-    </div>
+  `, 'FlashBuddy - Download') +
+  releaseCard('FlashBuddy',        appRelease, a => a.name.endsWith('.html'), 'Standalone · no setup required') +
+  releaseCard('FlashBuddy Extras', extRelease, a => a.name.endsWith('.zip'),  'Chrome extension · install manually', 'The Chrome extension counterpart to FlashBuddy — import Quizlet decks directly into the app.') +
+  `<div class="bottom-links">
+    <a class="gh-link" href="https://github.com/${esc(GITHUB_REPO)}" target="_blank" rel="noopener">View on GitHub →</a>
+    <a href="https://github.com/${esc(GITHUB_REPO)}" target="_blank" rel="noopener"><img src="https://img.shields.io/github/stars/${esc(GITHUB_REPO)}?style=social" alt="GitHub stars" style="vertical-align:middle"></a>
+    <a class="docs-link" href="/docs">How to Use →</a>
   </div>` + shellEnd;
 }
 

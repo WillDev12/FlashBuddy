@@ -81,12 +81,10 @@ function openEditor(id) {
     populateRows([{term:'',def:''},{term:'',def:''}]);
   }
 
-  document.getElementById('quizletUrl').value = '';
-  document.getElementById('importStatus').textContent = '';
-  document.getElementById('importStatus').className = 'import-status';
   document.getElementById('exportString').value = '';
   document.getElementById('exportStatus').textContent = '';
   document.getElementById('exportStatus').className = 'import-status';
+  updateExtStatus(extInstalled);
   const editorModal = document.getElementById('editorModal');
   _editorFocusOrigin = document.activeElement;
   editorModal.classList.remove('hidden');

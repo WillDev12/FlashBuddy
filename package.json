@@ -1,10 +1,10 @@
 {
   "name": "flashbuddy",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "scripts": {
     "build": "node build.js",
     "watch": "node build.js --watch",
-    "scraper": "cd scraper && npm start"
+    "server": "cd server && npm start"
   },
   "devDependencies": {
     "archiver": "^7.0.0",

@@ -2,9 +2,7 @@
 
 ## Getting Started
 
-Download `Flashbuddy vx.x.x -- Standalone` from the [download page](download) and open it in any browser. No install, no account, no internet required.
-
-*For details on how to install the URL Import release, see [Setting up the Scraper Server](setup-scraper-server).*
+Download `FlashBuddy-standalone.html` from the [download page](https://flashbuddy.vercel.app/download) and open it in any browser. No install, no account, no internet required.
 
 ## Creating a Deck
 
@@ -44,15 +42,15 @@ Select a deck from the home screen, then pick a mode:
 
 FlashBuddy supports several import methods:
 
-- **By URL** — requires the scraper server. See [Import by URL](import-cards-using-url).
+- **By Extension** — install FlashBuddy Extras (Chrome), open a Quizlet deck, click the FlashBuddy button. See [Import via Extension](import-cards-using-extension).
 - **By PDF** — save a Quizlet set as a PDF and upload it. See [Import via PDF](import-cards-using-pdf).
-- **Paste export string** — copy a Quizlet export string and paste it directly into the import field in the deck editor.
+- **Paste export string** — on Quizlet, click **…** → **Export**, copy the text, and paste it directly into the import field in the deck editor.
 
 ## Browser Compatibility
 
 FlashBuddy works in Chrome, Firefox, Edge, Safari, and Chromium-based browsers (Brave, Arc, Opera). Mobile browsers work for studying; the deck editor is best on desktop.
 
-ChromeOS users: URL import (scraper) is not supported. Use the [PDF import method](import-cards-using-pdf) instead.
+The **FlashBuddy Extras** extension for Quizlet import is Chrome/Chromium only. PDF and export-string import work in all browsers.
 
 ## Backing Up Your Decks
 
@@ -76,4 +74,4 @@ Your decks are saved in the browser's local storage, so they persist between ses
 
 ## Offline Use
 
-FlashBuddy works fully offline after the initial page load. Features that require a scraper server (URL import) are gracefully disabled when the server is unreachable.
+FlashBuddy works fully offline after the initial page load. PDF.js is loaded once from a CDN on first use, then cached — subsequent PDF imports work offline too.

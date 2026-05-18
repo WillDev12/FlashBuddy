@@ -1,0 +1,13 @@
+{
+  "name": "flashbuddy-server",
+  "version": "1.0.0",
+  "description": "Download and docs server for FlashBuddy",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "marked": "^12.0.0"
+  }
+}

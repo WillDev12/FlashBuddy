@@ -5,7 +5,8 @@ const archiver = require('archiver');
 const { minify: terser } = require('terser');
 
 const SRC        = path.join(__dirname, 'src');
-const SCRAPER    = path.join(__dirname, 'scraper');
+const SERVER     = path.join(__dirname, 'server');
+const EXTENSION  = path.join(__dirname, 'extension');
 const DIST       = path.join(__dirname, 'dist');
 const { version: APP_VERSION } = require('./package.json');
 
@@ -37,19 +38,12 @@ function readDir(dir) {
     .join('\n\n');
 }
 
-const FAVICON_B64 = fs.readFileSync(path.join(__dirname, 'scraper', 'favicon.png')).toString('base64');
+const FAVICON_B64 = fs.readFileSync(path.join(SERVER, 'favicon.png')).toString('base64');
 
-async function buildHtml(scraperUrl) {
+async function buildHtml() {
   const css = readDir(path.join(SRC, 'css'));
   let js    = readDir(path.join(SRC, 'js'));
-  js = js
-    .replace(/const APP_VERSION = .*;/, `const APP_VERSION = '${APP_VERSION}';`)
-    .replace(
-      /const SCRAPER_URL = .*;/,
-      scraperUrl === null
-        ? 'const SCRAPER_URL = null;'
-        : `const SCRAPER_URL = '${scraperUrl}';`
-    );
+  js = js.replace(/const APP_VERSION = .*;/, `const APP_VERSION = '${APP_VERSION}';`);
   const { code } = await terser(js, { compress: true, mangle: true });
   let out = fs.readFileSync(path.join(SRC, 'template.html'), 'utf8');
   out = out
@@ -75,41 +69,37 @@ async function build() {
   const t = new Date().toLocaleTimeString();
 
   // ── Dev build (index.html) ──
-  const devHtml = await buildHtml('http://localhost:3000');
-  fs.writeFileSync(path.join(__dirname, 'index.html'), devHtml);
-  console.log(`[${t}] Built → index.html (${(devHtml.length / 1024).toFixed(1)} KB)`);
+  const html = await buildHtml();
+  fs.writeFileSync(path.join(__dirname, 'index.html'), html);
+  console.log(`[${t}] Built → index.html (${(html.length / 1024).toFixed(1)} KB)`);
 
   // ── Standalone ──
   const standaloneDir = path.join(DIST, 'standalone');
   fs.mkdirSync(standaloneDir, { recursive: true });
-  const standaloneHtml = await buildHtml(null);
-  const standaloneOut  = path.join(standaloneDir, 'FlashBuddy-standalone.html');
-  fs.writeFileSync(standaloneOut, standaloneHtml);
-  console.log(`[${t}] Built → dist/standalone/FlashBuddy-standalone.html (${(standaloneHtml.length / 1024).toFixed(1)} KB)`);
+  const standaloneOut = path.join(standaloneDir, 'FlashBuddy-standalone.html');
+  fs.writeFileSync(standaloneOut, html);
+  console.log(`[${t}] Built → dist/standalone/FlashBuddy-standalone.html (${(html.length / 1024).toFixed(1)} KB)`);
 
-  // ── URL Import ──
-  const scraperDir = path.join(DIST, 'url-import');
-  fs.mkdirSync(scraperDir, { recursive: true });
-  const scraperHtml = await buildHtml('http://localhost:3000');
-  const zipOut      = path.join(scraperDir, 'FlashBuddy-url-import.zip');
-
-  await zip(zipOut, archive => {
-    // Main app
-    archive.append(scraperHtml, { name: 'FlashBuddy.html' });
-    // Start scripts and README at root (alongside FlashBuddy.html)
-    for (const file of ['start.sh', 'start.bat', 'README.txt']) {
-      const p = path.join(SCRAPER, file);
-      if (fs.existsSync(p)) archive.file(p, { name: file });
-    }
-    // Scraper server files in ./scraper/
-    for (const file of ['server.js', 'views.js', 'favicon.png', 'package.json']) {
-      const p = path.join(SCRAPER, file);
-      if (fs.existsSync(p)) archive.file(p, { name: `scraper/${file}` });
-    }
+  // ── Extension zip ──
+  const extDist = path.join(DIST, 'extension');
+  fs.mkdirSync(extDist, { recursive: true });
+  const extZip = path.join(extDist, 'FlashBuddy-extension.zip');
+  await zip(extZip, archive => {
+    archive.directory(EXTENSION, false);
+    archive.file(path.join(SERVER, 'favicon.png'), { name: 'icon.png' });
   });
+  const extSize = (fs.statSync(extZip).size / 1024).toFixed(1);
+  console.log(`[${t}] Built → dist/extension/FlashBuddy-extension.zip (${extSize} KB)`);
 
-  const zipSize = (fs.statSync(zipOut).size / 1024).toFixed(1);
-  console.log(`[${t}] Built → dist/url-import/FlashBuddy-url-import.zip (${zipSize} KB)`);
+  // ── Extension dev (unpacked) ──
+  const extDev = path.join(EXTENSION, 'dev');
+  fs.rmSync(extDev, { recursive: true, force: true });
+  fs.mkdirSync(extDev, { recursive: true });
+  for (const file of fs.readdirSync(EXTENSION).filter(f => f !== 'dev')) {
+    fs.copyFileSync(path.join(EXTENSION, file), path.join(extDev, file));
+  }
+  fs.copyFileSync(path.join(SERVER, 'favicon.png'), path.join(extDev, 'icon.png'));
+  console.log(`[${t}] Built → extension/dev/ (unpacked)`);
 }
 
 build().catch(e => { console.error('Build error:', e.message); process.exit(1); });

@@ -192,8 +192,11 @@
       margin-bottom: 14px;
     }
 
-    .url-row { display: flex; gap: 8px; margin-bottom: 8px; }
-    .url-row input { flex: 1; }
+    .ext-status-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .ext-status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink3); flex-shrink: 0; }
+    .ext-status-dot.connected { background: var(--green); }
+    .ext-status-text { font-size: 13px; font-weight: 600; color: var(--ink2); }
+    .ext-hint { font-size: 13px; color: var(--ink3); margin: 0 0 4px; line-height: 1.5; }
 
     .import-status {
       font-size: 13px;
@@ -205,19 +208,6 @@
     .import-status.ok { color: var(--green); }
     .import-status.err { color: var(--red); }
     .import-status.loading { color: var(--ink3); }
-
-    .offline-notice {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--gold);
-      background: var(--gold-light);
-      border: 1px solid var(--gold);
-      border-radius: 6px;
-      padding: 5px 10px;
-      margin-bottom: 8px;
-    }
-    .offline-notice.hidden { display: none; }
 
     .export-delimiters {
       display: flex;
